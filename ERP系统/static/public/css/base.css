@@ -1,0 +1,64 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    font-size: 14px !important;
+    overflow: hidden;
+}
+#app{height:100%;}
+
+.white{background:white;}
+
+.txtL{text-align: left;}
+.txtC{text-align: center;}
+.txtR{text-align: right;}
+
+.fSiz16{font-size:16px;}
+.fSiz14{font-size:14px;}
+.fSiz12{font-size:12px;}
+
+h1,h2,h3{
+	color:#1c2438;
+}
+h1{
+	font-size:16px !important;
+}
+h2{
+	font-size:14px;
+}
+h3{
+	font-size:12px;
+}
+
+.mT{}
+.mR{}
+.mB{margin-bottom:10px;}
+.mL{}
+
+/*所有栅格样式*/
+.ivu-col{
+	/*border:1px solid red;*/
+}
+/*表单label字体修改*/
+.logReg.ivu-form .ivu-form-item-label{
+	font-size:16px;
+	font-weight: 600;
+}
+/*主盒子样式*/
+.mainBox{
+	width:1200px;
+	margin: 60px auto 0;
+	border:1px solid red;
+}
+/*卡片里的div盒子样式*/
+.ivu-card-body{
+	padding:0 !important;
+}
+/*表单*/
+.form2 .ivu-form-item{
+	margin:0;
+}
+/*表格里的表单错误提示位置*/
+.tableFormInstance .ivu-form-item{
+	margin:0;
+}
+

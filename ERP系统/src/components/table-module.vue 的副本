@@ -1,0 +1,665 @@
+<!--万能列表组件-->
+<template>
+	<div>
+		
+		<div style="display:flex;margin-bottom:10px;" v-if="screenTop ? screenTop : true">
+			<!--日期-->
+			<DatePicker v-if="dateScreen ? dateScreen : true" @on-change="formattedDate" :value="dateVal" type="month" placeholder="选择时间" style="width: 95px;margin-right:10px;"></DatePicker>
+			<!--下拉-->
+		    <Select v-if="cityList" @on-change="seleValue" :value="seleVal" style="width:200px">
+		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+		    </Select>
+		    <!--搜索框-->
+			<Input class="seekBox" v-if="searchBox ? searchBox : true" @on-click="searchBut()" @on-enter="enterBut" v-model="txtVal" placeholder="搜你想搜的..." icon="ios-search" style="width:300px;margin-left:auto;"></Input>
+			<Button style="margin-left:2px;" type="ghost" @click="searchBut(true)" size="small" icon="close-round"></Button>
+		</div>
+		<!--表格-->
+		<Table 
+			@on-selection-change="change" 
+			@on-select-cancel="cancel" 
+			class="table-box" 
+			border 
+			ref="selection"
+			:columns="columnsList"
+			:data="historyData">
+		</Table>
+		
+		<div style="margin-top:10px;overflow: hidden;">
+			
+			<!--全选按钮-->
+			<div style="float: left;margin-right:20px;" v-if="columnsList.some(item => item.type === 'selection')">
+				<Button type="ghost" size="small" @click="handleSelectAll(true)">全选</Button>
+	        	<Button type="ghost" size="small" @click="handleSelectAll(false)">取消</Button>
+	        	<Button type="error" size="small" @click="cpmShow">删除</Button>
+	        	<p style="display:inline-block;margin-left:10px;">
+	        		已选
+	        		<span style="color:red">{{selectCount}}</span>
+	        		项
+	        	</p>
+			</div>
+			
+			<!--增加记录-->
+			<div style="float: left;" v-if="addRecord ? addRecord : true && addButton">
+				<Button type="dashed" size="small" @click="add" icon="plus-round">增加记录</Button>
+			</div>
+			
+			<!--分页-->
+			<div style="float: right;">
+				<Page ref="page" placement="top" :total="dataCount" :current="page" show-total show-elevator show-sizer @on-change="changePage" @on-page-size-change="pageSize"></Page>
+			</div>
+			
+		</div>
+		
+		<!--删除弹窗-->
+		<Modal 
+	    	v-model="remCpm" 
+	    	@on-cancel="cancelDel" 
+	    	:mask-closable="false" 
+	    	width="360">
+	        <p slot="header" style="color:#f60;text-align:center">
+	            <Icon type="information-circled"></Icon>
+	            <span>删除确认</span>
+	        </p>
+	        <div style="text-align:center">
+	            <p>
+	            	确定删除已选中的
+	            	<span style="color:red">{{selectCount}}</span>
+	            	条数据？
+	            </p>
+	        </div>
+	        <div slot="footer">
+	            <Button type="error" size="large" long @click="del">确定删除</Button>
+	        </div>
+	    </Modal>
+	    
+	</div>
+</template>
+
+<script>
+
+const editButton = (_this,h,currentRow,params) => {//编辑按钮
+	return h('Button',{
+		props: {
+            type: currentRow.editting ? 'success' : 'primary',
+            size:'small',
+        },
+        style: {
+        	margin:'2px',
+        },
+		on:{
+			click:() => {
+				if(!currentRow.editting){
+					
+					currentRow.editting = true;
+					
+					_this.historyData.forEach((item) => {
+						if(item.id === params.row.id){
+							item.editting = true;
+						}
+					});
+					
+                	_this.historyData = JSON.parse(JSON.stringify(_this.historyData));//更新当前表格数据
+                	
+				}else{
+					
+					currentRow.editting = false;
+					
+					_this.historyData.forEach((item) => {
+						if(item.id === params.row.id){
+							item.editting = false;
+						}
+					});
+					
+					_this.historyData = JSON.parse(JSON.stringify(_this.historyData));//更新当前表格数据
+					
+				}
+			}
+		}
+	},currentRow.editting ? '保存' : '编辑');
+};
+
+const delButton = (_this,h,params) => {//删除按钮
+	return h('Poptip',{
+		props: {
+			confirm:true,
+	        title:"您确认删除这条内容吗？",
+	        transfer:true,
+	        placement:"top-end"
+        },
+        on:{
+			'on-ok'(){
+				
+				_this.tableData.forEach((item,index,arr) => {
+					if(item.id === params.row.id){
+						arr.splice(index,1);
+					}
+				});
+				
+				_this.tabArr.forEach((item,index,arr) => {
+					if(item.id === params.row.id){
+						arr.splice(index,1);
+					}
+				});
+				
+				_this.historyData.splice(params.index,1);
+				
+	            if((_this.tabArr.length > _this.page_Size) && _this.historyData.length !== 0){
+	            	
+	            	console.log(1+'：没筛选，有页码');
+	            	_this.upPage();//更新页码
+	            	
+	            	
+	            }else if((_this.tabArr.length > _this.page_Size) && _this.historyData.length === 0){
+	            	
+	            	console.log(2+'：没筛选，有页码，当前页数据为0');
+	            	_this.upPage(_this.page-1);//更新页码
+	            	
+	            }else if((_this.tabArr.length < _this.page_Size) && _this.historyData.length !== 0){
+	            	
+	            	console.log(3+'：没页码，当前页数据不为0');
+	            	
+	            }else if((_this.tabArr.length < _this.page_Size) && _this.historyData.length === 0){
+	            	
+	            	console.log(4+'：筛选时，没页码，当前页数据为0');
+	            	_this.tabArr = _this.tableData;
+	            	_this.handleListApproveHistory();//初始化表格数据
+	            	
+	            	_this.txtVal = '';//搜索框值
+		            _this.dateVal = '';//日期值
+		            _this.seleVal = _this.cityList ? _this.cityList[0].value : true;//下拉值
+	            	
+	            }else{
+	            	
+	            	_this.screenState(() => {//筛选状态
+	            		console.log(5+'：有筛选，没页码');
+	            		_this.screening();
+	            	},() => {
+	            		console.log(6+'：没筛选，没页码');
+	            		_this.tabArr = _this.tableData;
+	            		_this.handleListApproveHistory();//初始化表格数据
+	            	});
+	            	
+	            }
+	            
+	            _this.dataCount = _this.tabArr.length;//总条数
+	            
+				_this.$Message.success('删除成功');
+				
+			},
+			'on-cancel'(){
+				_this.$Message.info('取消删除');
+			}
+		}
+	},[
+		h('Button',{
+			props: {
+	            type: 'error',
+	            size:'small'
+	        },
+	        style: {
+	        	margin:'2px',
+	        }
+		},'删除')
+	]);
+};
+
+export default {
+	props:{
+		
+	 	columnsList:{//父级传过来的所有表头数据
+	 		type: Array,
+            required: true
+	 	},
+	 	
+	 	tableData:Array,//表格数据
+	 	
+	 	cityList:Array,//select选择器数据
+	 	
+	 	screenTop:Boolean,//筛选栏  默认true
+	 	
+	 	dateScreen:Boolean,//日期  默认true
+	 	
+	 	searchBox:Boolean,//搜索框  默认true
+	 	
+	 	addRecord:Boolean,//增加记录  默认true
+	 },
+    data () {
+        return {
+        	
+            dataCount:0,// 初始化总条数
+            
+            page_Size:10,// 每页显示多少条
+            
+            page:1,//页码
+            
+            selectCount:0,//已选数量
+            
+            tabArr:this.tableData || [],//表格所有数据
+            
+            historyData:[],//表格当前页数据
+            
+            txtVal:'',//搜索框值
+            
+            dateVal:'',//日期值
+            
+            defaultSele: this.cityList ? this.cityList[0].value : true,//下拉默认值
+            
+            seleVal: this.cityList ? this.cityList[0].value : true,//下拉值
+            
+            remCpm:false,//弹窗
+            
+            addButton:true,//按钮在筛选下不要显示
+            
+        }
+    },
+    methods:{
+    	init(){//初始化
+    		
+    		let _this = this
+    		
+    		this.columnsList.forEach(item => {//初始化表格内容
+    			
+    			if(item.sequenceNum){//添加序号
+    				item.render = (h, params) => {
+    					return h('span',((this.page-1)*10) + (params.index+1));
+    				}
+    			}
+    			
+    			if(item.editable){//编辑字段
+    				item.render = (h, params) => {
+    					
+    					let current = _this.tabArr.filter((item) => {return item.id === params.row.id;});
+    					let currentRow = current[0];
+    					
+    					if(!currentRow.editting){//隐藏文本输入框
+    						
+    						return h('span',currentRow[item.key]);
+    						
+    					}else{//显示文本输入框
+    						return h('Input', {
+                                props: {
+                                    type: 'text',
+                                    value: currentRow[item.key],
+                                    placeholder:'请输入'+item.title
+                                },
+                                on: {
+                                    'on-change' (event) {
+                                    	currentRow[item.key] = event.target.value;
+                                    }
+                                }
+                            });
+    					}
+    					
+    				}
+    			}
+    			
+    			if(item.editableDate){//日期编辑
+    				item.render = (h, params) => {
+    					let current = _this.tabArr.filter((item) => {return item.id === params.row.id;});
+    					let currentRow = current[0];
+    					
+    					if(!currentRow.editting){
+    						return h('span',currentRow[item.key]);
+    					}else{
+    						return h('DatePicker',{
+    							props:{
+    								type:'date',
+    								value:currentRow[item.key],
+    								placeholder:'请输入'+item.title,
+    							},
+    							on:{
+    								'on-change'(val){
+    									currentRow[item.key] = val;
+    								}
+    							}
+    						});
+    					}
+    				}
+    			}
+    			
+    			if(item.calculate){//添加计算功能
+    				item.render = (h, params) => {
+    					
+    					let current = _this.tabArr.filter((item) => {return item.id === params.row.id;});
+	    				let currentRow = current[0];
+	    				
+						if(currentRow[item.calculate.x] || currentRow[item.calculate.y]){
+							let sum = parseFloat(currentRow[item.calculate.x]);
+							let one = parseFloat(currentRow[item.calculate.y]);
+							let num = (sum*10) * (one*10) / 100;
+							if(!num){
+								currentRow[item.key] = '- - - -'
+							}else{
+								currentRow[item.key] = num + '元';
+							}
+							return h('span',currentRow[item.key]);
+						}
+    				}
+    			}
+    			
+	    		if(item.handle){//添加操作按钮
+	    			item.render = (h, params) => {
+	    				
+	    				let current = _this.tabArr.filter((item) => {return item.id === params.row.id;});
+	    				let currentRowData = current[0];
+	    				
+	    				let children = [];
+	    				
+	    				item.handle.forEach(item => {
+		    				if(item === 'edit'){//编辑按钮
+		    					children.push(editButton(this,h,currentRowData,params));
+		    				}else if(item === 'delete'){//删除按钮
+		    					children.push(delButton(this,h,params));
+		    				}
+		    			});
+		    			
+		    			return h('div',children);
+		    			
+	    			}
+	    		}
+	    		
+	    	});
+	    	
+	    	this.handleListApproveHistory();//初始化表格数据
+    	},
+    	routePara(page,date,sele,input){//路由参数
+    		this.$router.push(//动态路由
+	    		{
+	    			name: 'orderList',
+	    			query: {
+	    				page:page,
+	    				date:date,
+	    				sele:sele,
+	    				input:input,
+	    			}
+	    		}
+    		);
+    	},
+    	screening(){//筛选方法
+    		
+    		this.screenState(() => {//筛选状态
+    			
+    			//console.log('正在筛选...');
+    			this.addButton = false;
+    			
+    			let newArr = [];
+    			this.tabArr = this.tableData;
+    			this.tabArr.forEach(item => {
+    				
+    				let str = '';
+    				this.columnsList.forEach(item2 => {
+    					if(item2.key){
+    						str += item[item2.key];
+    					}
+    				});
+    				
+    				if(item.date.indexOf(this.dateVal) >= 0 && this.seleVal === this.defaultSele && str.indexOf(this.txtVal) >= 0){
+    					newArr.push(item);
+    				}
+    				else if(item.date.indexOf(this.dateVal) >= 0 && item.state === this.seleVal && str.indexOf(this.txtVal) >= 0){
+    					newArr.push(item);
+    				}
+    				else{
+    				}
+    				
+    			});
+    			this.tabArr = newArr;
+    			
+    		},() => {
+    			
+    			//console.log('结束筛选');
+    			this.addButton = true;
+    			this.tabArr = this.tableData;
+    			
+    		});
+    		
+    		this.handleListApproveHistory();//初始化表格数据
+    		
+    		setTimeout(() => {//保持当前显示条数
+    			if(this.$refs.page){
+    				this.$refs.page.currentPageSize = this.page_Size
+    			}
+    		},10);
+    		
+    	},
+    	screenState(start,end){//筛选状态
+    		let Boole = !this.txtVal && !this.dateVal && this.seleVal === this.cityList[0].value;
+    		if(Boole){
+    			end && end();
+    		}else{
+    			start && start();
+    		}
+    	},
+    	formattedDate(format){//格式化日期(筛选日期)
+    		this.dateVal = format;
+    		this.screening();//调用筛选方法
+    		this.routePara(this.page,this.dateVal,this.seleVal,this.txtVal);
+    	},
+    	seleValue(val){//选择器选择时触发
+    		this.seleVal = val;
+    		this.screening();//调用筛选方法
+    		this.routePara(this.page,this.dateVal,this.seleVal,this.txtVal);
+    	},
+    	searchBut(io = false){//搜索按钮
+    		
+			if(io){
+				this.txtVal = '';
+			}
+			
+    		this.screening();
+    		this.routePara(this.page,this.dateVal,this.seleVal,this.txtVal);
+    	},
+    	enterBut(){//按回车键搜索
+    		this.screening();
+    		this.routePara(this.page,this.dateVal,this.seleVal,this.txtVal);
+    	},
+    	handleSelectAll (onOff) {//全选
+            this.$refs.selection.selectAll(onOff);
+        },
+        change(sele){//选项改变时触发
+        	
+        	if(sele.length !== 0){//全选|单选
+        		sele.forEach((item1) => {
+        			this.tabArr.forEach((item2) => {
+        				if(item1.id === item2.id){
+        					item2._checked = true;
+        				}
+        			});
+        		});
+        		sele.forEach((item3) => {
+        			this.historyData.forEach((item4) => {
+        				if(item3.id === item4.id){
+        					item4._checked = true;
+        				}
+        			});
+        		});
+        		
+        	}else{//取消全选
+        		
+        		this.historyData.forEach(item => {
+        			item._checked = false;
+	        		this.tabArr.forEach(item2 => {
+						if(item2.id === item.id){
+							item2._checked = item._checked;
+						}
+					});
+        		});
+        		
+        	}
+        	this.count();//设置选中数量
+        },
+        cancel(sele,row){//选项取消时触发
+        	
+    		this.tabArr.forEach((item) => {
+    			if(item.id === row.id){
+    				item._checked = false;
+    			}
+    		});
+    		this.historyData.forEach((item2) => {
+    			if(item2.id === row.id){
+    				item2._checked = false;
+    			}
+    		});
+    		
+        },
+        count(){//已选数量
+			let arr = this.tabArr.filter((item) => {
+				if(item._checked){
+					return item
+				}
+			});
+			this.selectCount = arr.length;
+		},
+        handleListApproveHistory(){//初始化表格数据
+        	this.page = 1;
+        	
+    		this.dataCount = this.tabArr.length;//总条数
+        
+    		// 初始化显示，小于每页显示条数，全显，大于每页显示条数，取前每页条数显示
+    		if(this.tabArr.length < this.page_Size){
+    		    this.historyData = this.tabArr;
+    		}else{
+    		    this.historyData = this.tabArr.slice(0,this.page_Size);
+    		}
+    		
+    		this.historyData = JSON.parse(JSON.stringify(this.historyData));//解决了文本框输入焦点消失问题
+        },
+        changePage(index){//改变页码时触发
+        	this.page = index;
+        	let start = ( index - 1 ) * this.page_Size;//开始位置
+            let end = index * this.page_Size;//结束位置
+            this.historyData = this.tabArr.slice(start,end);//截取数组里指定的元素
+            
+            this.historyData = JSON.parse(JSON.stringify(this.historyData));//更新当前表格数据(解决了文本框输入焦点消失问题)
+            
+            this.routePara(this.page,this.dateVal,this.seleVal,this.txtVal);
+        },
+        upPage(price = this.page){//更新页码
+        	this.page = price;
+        	let start = ( this.page - 1 ) * this.page_Size;//开始位置
+            let end = this.page * this.page_Size;//结束位置
+            this.historyData = this.tabArr.slice(start,end);//截取数组里指定的元素
+            
+            this.historyData = JSON.parse(JSON.stringify(this.historyData));//更新当前表格数据(解决了文本框输入焦点消失问题)
+        },
+        pageSize(quantity){//改变显示条数时触发
+        	this.page_Size = quantity;
+        	this.handleListApproveHistory();//初始化表格数据
+        },
+        cpmShow(){//弹窗按钮
+        	if(this.selectCount !== 0){
+        		this.remCpm = true;
+        	}else{
+        		this.$Message.warning('请选择要删除的数据！');
+        	}
+        },
+        del(){//确定删除
+            	
+        	this.delDatas();//要删除的数据
+        	
+        	this.count()//更新已选数量
+        	
+            this.modal_loading = false;
+            
+            this.remCpm = false;
+            
+			this.page = 1;
+			
+			this.tabArr = this.tableData;
+			
+        	this.handleListApproveHistory();//初始化表格数据
+            
+            this.txtVal = '';//搜索框值
+            this.dateVal = '';//日期值
+            this.seleVal = this.cityList ? this.cityList[0].value : true;//下拉值
+            
+            this.$Message.success('删除成功');
+        },
+        delDatas(){//要删除的数据
+			for(let i=0; i<this.tableData.length; i++){
+				if(this.tableData[i]._checked){
+					this.tableData.splice(i,1);
+					i--
+				}
+			}
+		},
+        cancelDel(){//取消删除
+            this.$Message.info('取消删除');
+        },
+        add(){//添加纪录
+        	
+        	let addObj = {};
+        	
+        	addObj.id = this.tabArr.length + 1;
+        	
+        	addObj.editting = true;
+        	
+        	this.columnsList.forEach(item => {
+        		if(item.key){
+        			addObj[item.key] = '';
+        		}
+        	});
+        	
+        	this.tabArr.push(addObj);
+			
+			if(this.tabArr.length > this.page_Size){//有页码
+				
+				console.log('有页码');
+				setTimeout(() => {
+					this.upPage(this.$refs.page.allPages);//更新页码
+				},10);
+				
+			}else{//没页码
+				
+				console.log('没页码');
+				this.handleListApproveHistory();//初始化表格数据
+				
+			}
+			
+			console.log(this.tableData);
+        	this.dataCount = this.tabArr.length;//总条数
+        		
+       	},
+    	stateInfo(){//状态信息
+    		
+			this.page = parseInt(this.$route.query.page) || this.page;
+			this.dateVal = this.$route.query.date || this.dateVal;
+			this.seleVal = this.$route.query.sele || this.seleVal;
+			this.txtVal = this.$route.query.input || this.txtVal;
+			
+    	},
+    },
+    computed:{//计算属性
+    	
+    },
+    mounted(){//模板被渲染完毕之后执行
+    	
+    },
+    created(){//实例被创建完毕之后执行
+    	
+    	this.init();
+    	
+    	this.stateInfo();//状态信息
+    	console.log(this.$route.query);
+    	
+    },
+    watch:{//监测数据变化
+    	
+    	'$route' (to, from) {// 对路由变化作出响应...
+    		this.stateInfo();//状态信息
+    		console.log(to);
+	    },
+    	
+    }
+}
+</script>
+
+<style>
+	.table-box .ivu-table-body{
+		overflow:initial;
+	}
+	.seekBox i{
+		border-left:1px solid #DDDEE1;
+		cursor: pointer;
+	}
+</style>

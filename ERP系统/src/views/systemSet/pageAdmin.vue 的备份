@@ -1,0 +1,351 @@
+<template>
+	<div>
+		
+		<Card>
+			
+			<h1 slot="title">创建页面</h1>
+			
+			<div style="padding:15px 15px 0px;">
+				
+				<Form ref="pageForm" :model="pageForm" :rules="ruleInline1" inline>
+					
+					<FormItem prop="pageName">
+						<Input v-model="pageForm.pageName" placeholder="输入名称" clearable style="width: 150px"></Input>
+					</FormItem>
+					
+					<Button @click="addPage('pageForm')" type="dashed" icon="plus-round">创建页面</Button>
+					
+				</Form>
+					
+				<Form ref="mainTitlForm" :model="mainTitlForm" :rules="ruleInline2" inline>
+					
+				    <FormItem prop="mainTitleName">
+						<Input v-model="mainTitlForm.mainTitleName" placeholder="输入名称" clearable style="width: 150px"></Input>
+					</FormItem>
+					
+					<FormItem prop="pageId">
+						<Select ref="sele" style="width:160px" v-model="mainTitlForm.pageId" clearable placeholder="选择页面模板" @on-change="selePage">
+					        <Option v-for="item in allPage" :value="item.value" :key="item.value">{{ item.label }}</Option>
+					    </Select>
+				    </FormItem>
+				    
+					<Button @click="addMainTitle('mainTitlForm')" type="dashed" icon="plus-round">创建表单主标题</Button>
+					
+				</Form>
+				
+				<Form ref="sonTitleForm" :model="sonTitleForm" :rules="ruleInline3" inline>
+					
+					<FormItem prop="sonTitleName">
+						<Input v-model="sonTitleForm.sonTitleName" placeholder="输入名称" clearable style="width: 150px"></Input>
+					</FormItem>
+					
+					<FormItem prop="titleIdArr">
+						<Cascader style="display:inline-block;" placeholder="选择标题" :value="sonTitleForm.titleIdArr" :data="allTitle" change-on-select @on-change="seleTitle"></Cascader>
+					</FormItem>
+					
+					<Button @click="addSonTitle('sonTitleForm')" type="dashed" icon="plus-round">创建表单子标题</Button>
+					
+				</Form>
+				
+			</div>
+			
+		</Card>
+		
+		<div v-for="item in Pageinfo" style="margin-top:10px;">
+			<Card>
+				
+				<h1 slot="title">编辑模板</h1>
+				
+				<div style="display:flex;align-items: center;margin-top:30px;padding:15px;">
+					<h2 v-show="!item.editable">{{item.name}}</h2>
+					<Input v-show="item.editable" type="text" :value="item.name" style="width: 200px" @on-change="textVal($event,item)"></Input>
+					<div style="margin-left:auto;">
+						<ButtonGroup shape="circle">
+					        <Button type="ghost" :icon="item.icon || 'edit'" @click="edit(item,item.id,'system/pageClassEdit')"></Button>
+					        <Button type="ghost" icon="trash-a" @click="del(item.id,'system/pageClassDelete')"></Button>
+					    </ButtonGroup>
+					</div>
+				</div>
+				
+				<div style="margin-top:20px;" v-for="main in allTitle">
+					<div style="display:flex;align-items: center;">
+						<h2 v-show="!main.editable" style="padding-left:20px;">{{main.label}}</h2>
+						<Input v-show="main.editable" type="text" :value="main.label" style="width: 200px" @on-change="textVal($event,main)"></Input>
+						<div style="margin-left:auto;">
+							<ButtonGroup shape="circle">
+						        <Button type="ghost" :icon="main.icon || 'edit'" @click="edit(main,main.value,'system/pageClass_formTable_Edit')"></Button>
+						        <Button type="ghost" icon="trash-a" @click="del(main.value,'system/pageClass_formTable_Delete')"></Button>
+						    </ButtonGroup>
+						</div>
+					</div>
+					<div style="display:flex;align-items: center; margin-top:10px;" v-for="children in main.children">
+						<h3 v-show="!children.editable" style="padding-left:45px;">{{children.label}}</h3>
+						<Input v-show="children.editable" type="text" :value="children.label" style="width: 200px" @on-change="textVal($event,children)"></Input>
+						<div style="margin-left:auto;">
+							<ButtonGroup shape="circle">
+						        <Button type="ghost" :icon="children.icon || 'edit'" @click="edit(children,children.value,'system/pageClass_formTable_Edit')"></Button>
+						        <Button type="ghost" icon="trash-a" @click="del(children.value,'system/pageClass_formTable_Delete')"></Button>
+						    </ButtonGroup>
+						</div>
+					</div>
+				</div>
+				
+			</Card>
+		</div>
+		
+	</div>
+</template>
+
+<script>
+	export default {
+		components:{//模板
+		},
+		data(){
+			return{
+				
+				pageForm:{
+					pageName:'',
+				},
+				
+				mainTitlForm:{
+					mainTitleName:'',
+					pageId:'',
+				},
+				
+				sonTitleForm:{
+					sonTitleName:'',
+					titleIdArr:[],
+				},
+				
+				allPage: [],
+				allTitle: [],
+				
+				titleId:'',
+				
+				ruleInline1:{
+					pageName: [
+                        { required: true, message: '必须输入名称', trigger: 'blur' }
+                    ],
+				},
+				
+				ruleInline2:{
+					mainTitleName: [
+                        { required: true, message: '必须输入名称', trigger: 'blur' }
+                    ],
+					pageId: [
+						//验证的类型很重要，默认是字符串，类型不对验证会不能通过
+                        { type: 'number', required: true, message: '选择页面', trigger: 'change' }
+                    ],
+				},
+				
+				ruleInline3:{
+					sonTitleName: [
+                        { required: true, message: '必须输入名称', trigger: 'blur' }
+                    ],
+					titleIdArr: [
+						//验证的类型很重要，默认是字符串，类型不对验证会不能通过
+                        { type: 'array', required: true, message: '选择标题', trigger: 'change' }
+                    ],
+				},
+				
+				Pageinfo:[],
+				
+			}
+		},
+		methods: {
+			getPage(){//读取页面
+				this.$axios.post('system/pageClassList', {
+				})
+				.then(response => {
+					let arr = [];
+					response.data.forEach((item) => {
+						arr.push({
+							value:item.id,
+							label:item.name
+						});
+					});
+					this.allPage = arr;
+					this.mainTitlForm.pageId = this.allPage[0].value || '';
+					this.$nextTick(() => {
+						this.$refs.sele.updateOptions();
+					});
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			},
+			getMainTitle(classId){//读取标题
+				this.$axios.post('system/pageClass_formTable_List', {
+					pid_page_class:classId,
+					order:'{"id":"asc"}',
+				})
+				.then(response => {
+					
+					this.Pageinfo = response.data.pageInfo;
+					
+					let arr = [];
+					response.data.formGroupList.forEach((item) => {
+						
+						let obj1 = {}
+						obj1.value = item.id;
+						obj1.label = item.name;
+						obj1.children = [];
+						
+						item.children.forEach((item2) => {
+							let obj2 = {};
+							obj2.value = item2.id;
+							obj2.label = item2.name;
+							obj1.children.push(obj2);
+						});
+						
+						arr.push(obj1);
+						
+					});
+					this.allTitle = arr;
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			},
+			selePage(pageId){//选择页面
+				this.getMainTitle(pageId);
+			},
+			seleTitle(titleId){//选择标题
+				let id = titleId[titleId.length - 1];
+				this.sonTitleForm.titleIdArr = titleId;
+				this.titleId = id;
+			},
+			addPage(name){//创建页面
+				
+				this.$refs[name].validate((valid) => {
+                    if (valid) {
+                    	this.$axios.post('system/pageClassAdd', {
+						    name: this.pageForm.pageName,
+						    pid:''
+						})
+						.then(response => {
+							if(response.code === 1){
+								this.getPage();//读取页面
+								this.pageForm.pageName = '';
+								this.$Message.success('创建成功');
+							}
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+                    } else {
+                        this.$Message.error('创建失败!');
+                    }
+                })
+			},
+			addMainTitle(name){//创建主标题
+				this.$refs[name].validate((valid) => {
+                    if (valid) {
+                    	this.$axios.post('system/pageClass_formTable_Add', {
+                    	    name: this.mainTitlForm.mainTitleName,
+                    	    pid:0,
+                    	    pid_page_class:this.mainTitlForm.pageId,
+                    	    model:1
+                    	})
+                    	.then(response => {
+                    		if(response.code === 1){
+                    			this.getMainTitle(this.mainTitlForm.pageId);//读取标题
+                    			this.mainTitlForm.mainTitleName = '';
+                    			this.$Message.success('创建成功');
+                    		}
+                    	})
+                    	.catch(function (error) {
+                    		console.log(error);
+                    	});
+                    }else{
+                    	this.$Message.error('创建失败!');
+                    }
+                })
+			},
+			addSonTitle(name){//创建子标题
+				this.$refs[name].validate((valid) => {
+                    if (valid) {
+                    	this.$axios.post('system/pageClass_formTable_Add', {
+                    	    name: this.sonTitleForm.sonTitleName,
+                    	    pid:this.titleId,
+                    	    model:1,
+                    	})
+                    	.then(response => {
+                    		if(response.code === 1){
+                    			this.getMainTitle(this.mainTitlForm.pageId);//读取标题
+                    			this.sonTitleForm.sonTitleName = '';
+                    			this.$Message.success('创建成功');
+                    		}
+                    	})
+                    	.catch(function (error) {
+                    		console.log(error);
+                    	});
+                    }else{
+                    	this.$Message.error('创建失败!');
+                    }
+                })
+			},
+			edit(obj,id,url){//编辑按钮
+				
+				if(!obj.editable){//编辑
+					
+					obj.icon = 'checkmark-round';
+					obj.editable = true;
+					
+				}else{//保存修改
+					
+					this.$axios.post(url, {
+						id:id,
+                	    name:obj.name || obj.label,
+                	})
+                	.then(response => {
+                		this.getPage();//读取页面
+                	})
+                	.catch(function (error) {
+                		console.log(error);
+                	});
+					
+					
+					obj.icon = 'edit';
+					obj.editable = false;
+					
+				}
+				
+				this.Pageinfo = JSON.parse(JSON.stringify(this.Pageinfo));
+				
+			},
+			del(id,url){//删除按钮
+				
+				this.$axios.post(url, {
+					id:id,
+            	})
+            	.then(response => {
+              		this.getPage();//读取页面
+                	this.getMainTitle(this.mainTitlForm.pageId);//读取标题
+            	})
+            	.catch(function (error) {
+            		console.log(error);
+            	});
+				
+				this.sonTitleForm.titleIdArr = [];
+				
+			},
+			textVal(ev,obj){//设置修改的值
+				if(obj.name){
+					obj.name = ev.target.value;
+				}else{
+					obj.label = ev.target.value;
+				}
+			}
+		},
+		mounted(){//模板被渲染完毕之后执行
+	    	this.getPage();//读取页面
+		},
+		watch:{//监测数据变化
+			
+		},
+	}
+</script>
+
+<style>
+</style>
