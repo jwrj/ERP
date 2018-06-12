@@ -479,6 +479,8 @@
 							this.loading.spinShow = false;
 						},1000);
 						
+						this.$parent.$parent.$parent.getDataList(this.$parent.$parent.$parent.stateInfo);
+						
 						this.$Message.success('修改成功!');
 						
 					})

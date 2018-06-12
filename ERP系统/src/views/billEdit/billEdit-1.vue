@@ -71,7 +71,6 @@ export default {
         		{
         			title: '名称',
                     key: 'name',
-                    editable: true,
         		},
         		{
         			align:'center',

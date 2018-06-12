@@ -23,12 +23,24 @@
 			
 			<div style="padding:16px;">
 				
-				<h2 style="padding:10px;margin-bottom:-1px;border:1px solid #dddee1;">
-					订单总货款：<span style="color:#ed3f14;">{{sumPrice.toFixed(2)}}</span>
-					元
-				</h2>
+				
 				
 				<Table border :columns="recordColu" :data="recordData"></Table>
+				
+				<div style="padding:10px;margin-top:-1px;border:1px solid #dddee1;">
+					<h2 style="padding:2px 0;">
+						订单总货款：<span style="color:#ed3f14;">{{sumPrice.toFixed(2)}}</span>
+						元
+					</h2>
+					<h2 style="padding:2px 0;">
+						实收总货款：<span style="color:#ed3f14;">{{receivedMoney.toFixed(2)}}</span>
+						元
+					</h2>
+					<h2 style="padding:2px 0;">
+						欠款总金额：<span style="color:#ed3f14;">{{floatAdd(sumPrice,receivedMoney).toFixed(2)}}</span>
+						元
+					</h2>
+				</div>
 				
 			</div>
 			
@@ -195,7 +207,9 @@ export default {
     data () {//数据
         return {
         	
-        	sumPrice:0,
+        	sumPrice:0,//订单总货款
+        	
+        	receivedMoney: 0,//实总收货款
         	
         	recordColu: [
         		{
@@ -238,7 +252,7 @@ export default {
                     { required: true, message: '选择日期', trigger: 'change' }
                 ],
            },
-        	
+           
         }
     },
     methods: {//方法
@@ -302,6 +316,13 @@ export default {
 				
 			})
 		},
+		floatAdd(arg1,arg2){//解决减法精度问题
+    		let r1,r2,m;
+		    try{r1=arg1.toString().split(".")[1].length}catch(e){r1=0}
+		    try{r2=arg2.toString().split(".")[1].length}catch(e){r2=0}
+		    m=Math.pow(10,Math.max(r1,r2));
+		    return (arg1*m-arg2*m)/m;
+    	},
     	seleDate(val){
     		this.formInline.date = val;
     	},
@@ -317,7 +338,30 @@ export default {
     			DBname_dataPage: 'ExtendRepayment',
 			})
 			.then(response => {
+				
 				this.recordData = response.data.dataList.data;
+				
+				if(this.recordData.length > 0){
+					
+					this.receivedMoney = Number(this.recordData[0].number);
+				
+					function floatAdd(arg1,arg2){//解决精度问题
+					     var r1,r2,m;    
+					     try{r1=arg1.toString().split(".")[1].length}catch(e){r1=0}
+					     try{r2=arg2.toString().split(".")[1].length}catch(e){r2=0}
+					     m=Math.pow(10,Math.max(r1,r2));
+					     return (arg1*m+arg2*m)/m;
+					}
+				
+					this.recordData.forEach((item,index,arr) => {
+						if(index > 0){
+							this.receivedMoney = floatAdd(this.receivedMoney,Number(arr[index].number));
+						}
+					});
+					
+				}
+				
+				
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -376,7 +420,7 @@ export default {
 				clearInterval(time);
 			}
 		},10);
-    	
+		
 	},
     watch:{//监测数据变化
     	
