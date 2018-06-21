@@ -72,6 +72,25 @@ export default {
                     title: '日期',
                     key: 'create_time',
                 },
+                {
+        			title: '物品参数',
+                    render: (h, params) => {
+							
+						let str = '';
+						
+						params.row.item_info.formData.forEach(item => {
+							
+							item.formFields.forEach(item2 => {
+								
+								str += item2.label+'：'+item2.value+'，';
+								
+							});
+							
+						});
+						
+						return h('div',str)
+					},
+        		},
         	],
         	
         	dataList: [],
@@ -84,7 +103,6 @@ export default {
     		
     		this.$axios.post('items/warehousing_show', {
     			id: this.rowId,
-    			item_info_field: '["id","name"]',
 			})
 			.then(response => {
 				

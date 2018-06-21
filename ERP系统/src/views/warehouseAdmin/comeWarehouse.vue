@@ -158,11 +158,17 @@ export default {
         		},
         		{
         			align:'center',
-        			width:80,
+        			width:120,
         			title: '库存数',
                     render: (h, params) => {
 						return h('span',params.row.extend_data[0].number)
                     }
+        		},
+        		{
+        			align:'center',
+        			width:120,
+        			title: '需求数量',
+                    key: 'demandNumber',
         		},
         		{
         			width:160,
@@ -212,6 +218,8 @@ export default {
                     key: 'create_time',
                 },
         	],
+        	
+        	demandNumber: [],//订单物品详情数据
         	
         	procurementList: [],//采购列表
         	
@@ -297,11 +305,15 @@ export default {
     			
     			this.$refs.tabInstance.whereId = [];
     			
-    			this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
-    			
     			this.procurementList = [];
     			
     		}
+    		
+    		this.demandNumber = [];
+    		
+    		this.purchaseGoods.data = [];
+						    		
+    		this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
     		
     	},
     	
@@ -336,11 +348,13 @@ export default {
     	
     	onCurrentChange(currentRow){//单击某一行时触发
     		
-    		this.cpmBtn = true;
-    		
     		this.modalShow = true;
     		
+    		this.cpmBtn = true;
+    		
     		let arr = ["or"];
+    		
+    		this.demandNumber = currentRow.extend_data;//订单物品详情数据
     		
     		currentRow.extend_data.forEach(item => {
     			
@@ -348,9 +362,11 @@ export default {
     			
     		});
     		
+    		this.purchaseGoods.data = [];
+    		
     		this.$refs.tabInstance.whereId = arr;
     		
-    		this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
+    		this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
     		
     	},
     	
@@ -365,6 +381,15 @@ export default {
     			}else{
     				item.inputNumber = '';
     			}
+    		})
+    		
+    		arr.forEach(item => {
+    			item.demandNumber = '- -';
+    			this.demandNumber.forEach(item2 => {
+    				if(item.id == item2.item_id){
+    					item.demandNumber = item2.number;
+    				}
+    			})
     		})
     		
     		this.purchaseGoods.data = arr;
@@ -433,6 +458,8 @@ export default {
 								.then(response => {
 									
 									this.formData.name = '';
+									
+									this.demandNumber = [];
 									
 						    		this.purchaseGoods.data = [];
 						    		

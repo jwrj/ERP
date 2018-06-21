@@ -297,11 +297,13 @@ export default {
     			
     			this.$refs.tabInstance.whereId = [];
     			
-    			this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
-    			
     			this.procurementList = [];
     			
     		}
+    		
+    		this.purchaseGoods.data = [];
+			
+			this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
     		
     	},
     	
@@ -349,7 +351,9 @@ export default {
     		
     		this.$refs.tabInstance.whereId = arr;
     		
-    		this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
+    		this.purchaseGoods.data = [];
+						    		
+			this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
     		
     	},
     	
