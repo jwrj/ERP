@@ -16,6 +16,12 @@
 					    </Select>
 			        </FormItem>
 			        
+					<FormItem label="选择客户" prop="client" v-if="clientShow">
+			            <Select v-model="formData.client" filterable style="width:200px">
+					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+					    </Select>
+			        </FormItem>
+			        
 					<FormItem label="入库记录名称" prop="name">
 			            <Input v-model="formData.name" clearable placeholder="输入名称..." style="width:160px;"></Input>
 			        </FormItem>
@@ -219,6 +225,10 @@ export default {
         	
         	storageWayList: [],//入库类型列表
         	
+        	clientList: [],//客户列表
+        	
+        	clientShow: false,
+        	
         	purchaseGoods:{//需要购买的物品列表
         		data: []
         	},
@@ -230,6 +240,7 @@ export default {
             formData: {
             	way: '',
             	name: '',
+            	client: '',
             },
             
             formRules1: {
@@ -240,6 +251,10 @@ export default {
                 
                 name: [
                     { required: true, message: '请输入名称', trigger: 'blur' }
+                ],
+                
+                client: [
+                    { type: 'number', required: true, message: '请选择客户', trigger: 'change' }
                 ],
                 
             },
@@ -289,9 +304,52 @@ export default {
     			
     			this.cpmBtn = false;
     			
+    			this.clientShow = false;
+    			
+    			this.formData.client = '';
+    			
     			this.getProcurementList();//采购列表
     			
     		}else{
+    			
+    			if(val == 19){
+    				
+    				this.clientShow = true;
+    				
+    				this.$axios.post('oa/customer_list', {
+        				where: '{"pid_tree_title":["=","2"]}',
+		    			order: '{"id":"desc"}',
+		    			page: 1,
+		    			pageSize: 99999,
+					})
+					.then(response => {
+						
+						let arr = [];
+						
+						response.data.dataList.data.forEach(item => {
+							
+							arr.push({
+								label: item.name,
+								value: item.id,
+							});
+							
+						})
+						
+						this.clientList = arr;
+						
+						if(this.clientList.length > 0){
+							this.formData.client = this.clientList[0].value;
+						}
+						
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+    				
+    			}else{
+    				this.clientShow = false;
+    				this.formData.client = '';
+    			}
     			
     			this.cpmBtn = true;
     			
@@ -420,6 +478,8 @@ export default {
 		    								number: item.inputNumber,//数量
 		    								
 		    								action_time: '',//日期
+		    								
+		    								for_user_id: this.formData.client ? this.formData.client : null,//客户
 		    								
 		    								desc: '',//描述
 		    								

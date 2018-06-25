@@ -1020,9 +1020,13 @@ export default {
         		
         		status_class:this.stateListId,//下拉状态列表
         		
+        		DBname_dataPage: this.DBnameDataPage ? this.DBnameDataPage : '',
+        		
         		DBname_show_extend: this.DBnameShowExtend ? this.DBnameShowExtend : '',
         		
-        		DBname_dataPage: this.DBnameDataPage ? this.DBnameDataPage : '',
+        		warehousing_user_id: '',
+        		
+        		warehousing_action_type: '',
         		
 			})
 			.then((response) => {

@@ -39,7 +39,7 @@
 					        <Option v-for="item in goodsClassList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					    </Select>
 					    
-					    <Button type="dashed" icon="plus-round" @click="addSize('addGoods')">添加规格</Button>
+					    <!--<Button type="dashed" icon="plus-round" @click="addSize('addGoods')">添加规格</Button>-->
 					    
 				    </FormItem>
 					
@@ -94,7 +94,7 @@ export default {
         	
         	goodsClassList: [],//物品分类数据列表
         	
-        	addSizeList: [],//物品规格列表
+        	addSizeList: [],//物品规格表单
         	
         	addGoods: {//表单值
         		name: '',
