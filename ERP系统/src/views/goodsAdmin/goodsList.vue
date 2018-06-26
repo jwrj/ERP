@@ -67,7 +67,7 @@ export default {
                     }
         		},
         		{
-        			title: '物品其它信息',
+        			title: '物品参数',
                     render: (h, params) => {
 							
 						let str = '';
@@ -96,20 +96,6 @@ export default {
         }
     },
     methods: {//方法
-    	
-    	ajax(){
-    		
-    		this.$axios.post('接口路径', {
-    			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
-    	},
     	
     },
     computed:{//计算属性

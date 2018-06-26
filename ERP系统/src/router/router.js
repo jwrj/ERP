@@ -168,6 +168,12 @@ export const appRouter = [
                 component: resolve => { require(['@/views/goodsAdmin/batchAddGoods.vue'], resolve); }
             },
             {
+                path:'configuration',
+                name:'configuration',
+                title:'配置物品',
+                component: resolve => { require(['@/views/goodsAdmin/configuration.vue'], resolve); }
+            },
+            {
                 path:'goodsList',
                 name:'goodsList',
                 title:'物品列表',

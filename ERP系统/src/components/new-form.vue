@@ -80,6 +80,10 @@ export default {
 			required: true,//必传
 		},
 		
+		parentInfo: {//info
+			type:Object,//类型
+		},
+		
 		titleName:{//标题名称
 			type: String,
       		default: '标题'
@@ -196,7 +200,7 @@ export default {
         	
         	let num1 = 0;
 			let num2 = 0;
-        	
+			
         	this.$parent.$refs['formItem'].validate((valid) => {
         		
                 if (valid) {
@@ -213,11 +217,11 @@ export default {
 		        	if(num1 === num2){
 		        		
 		        		let formDatasString = JSON.stringify(this.formDatas);
-
+						
 		        		let info = {
 		        			name:this.$parent.formItem.name,
 		        			pid_tree_title:this.pageId,
-		        			use_dataPage_ids: JSON.stringify([this.useDataPageIdArr]),
+		        			use_dataPage_ids: this.useDataPageIdArr.length > 0 ? JSON.stringify([this.useDataPageIdArr]) : null,
 		        		}
 		        		
 		        		let infoString = JSON.stringify(info);
@@ -298,7 +302,7 @@ export default {
 	        				
 	        				this.$axios.post(this.submitUrl, {
 				        		fields:formDatasString,
-				        		info:infoString,
+				        		info: this.parentInfo ? JSON.stringify(this.parentInfo) : infoString,
 				        		template_FormTable_ids:this.formIDS,
 							})
 							.then((response) => {
@@ -311,6 +315,8 @@ export default {
 									this.formList(this.defaultTem);//读取标题表单列表
 									
 									this.$Message.success('提交成功!');
+									
+									this.$emit('submitChange');//侦听父级事件
 									
 								}
 							})

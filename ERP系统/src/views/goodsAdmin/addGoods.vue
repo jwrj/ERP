@@ -6,13 +6,13 @@
 			
 			<h1 slot="title">添加物品</h1>
 			
-			<div style="padding:24px 15px 0;">
+			<div style="padding:16px;">
 				
-				<Form ref="addGoods" :model="addGoods" :rules="articleRules" inline>
+				<Form ref="formItem" :model="formItem" :rules="ruleItem" :label-width="70">
 						
-					<FormItem prop="name">
+					<FormItem prop="name" label="物品名称">
 						<AutoComplete
-					        v-model="addGoods.name"
+					        v-model="formItem.name"
 					        :clearable="true"
 					        @on-search="autoData"
 					        placeholder="输入物品名称"
@@ -33,90 +33,82 @@
 				        </AutoComplete>
 					</FormItem>
 					
-					<FormItem prop="classId">
+					<FormItem prop="classId" label="物品分类">
 						
-						<Select style="width:160px" filterable v-model="addGoods.classId" placeholder="无数据">
+						<Select style="width:160px" filterable v-model="formItem.classId" placeholder="无数据">
 					        <Option v-for="item in goodsClassList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					    </Select>
 					    
-					    <!--<Button type="dashed" icon="plus-round" @click="addSize('addGoods')">添加规格</Button>-->
-					    
 				    </FormItem>
 					
+					<FormItem label="物品规格">
+						
+						<Checkbox v-model="formsShow"></Checkbox>
+						
+				    </FormItem>
+				    
 				</Form>
-				
-				<div v-for="(item,i) in addSizeList">
-					
-					<Card style="margin-bottom:15px;">
-						
-						<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
-							<h2 v-if="!item.editable">{{item.name}}</h2>
-							<Input v-if="item.editable" :value="item.name" @on-change="inputChange" style="width:150px;"></Input>
-							<div>
-								<ButtonGroup shape="circle">
-							        <Button type="ghost" shape="circle" :icon="item.editable ? 'checkmark-round' : 'edit'" @click="edit(item,i)"></Button>
-							        <Button v-if="item.editable" type="ghost" shape="circle" icon="close-round" @click="cancel(item)"></Button>
-							    </ButtonGroup>
-							    <Button type="ghost" shape="circle" icon="trash-a" @click="delSize(item.id)"></Button>
-							</div>
-						</div>
-						
-						<div>
-							<form-mod ref="modInstance" @increment="formEvent" :pid="Number(item.id)"></form-mod>
-						</div>
-						
-					</Card>
-					
-				</div>
 				
 			</div>
 			
-			<div style="text-align: center;padding:15px;">
-				<Button type="primary" @click="add('addGoods')">提交</Button>
+			<div style="text-align: center;padding-bottom:16px;" v-if="!formsShow">
+				<Button type="primary" @click="add('formItem')">新增物品</Button>
 			</div>
 			
 		</Card>
+		
+		<new-form
+			style="margin-top:4px;"
+			v-if="formsShow"
+			:pid-tree-class="26"
+			:pageId="52"
+			titleName="规格"
+			buttonName="新增物品"
+			:parentInfo="{ name: formItem.name, pid_tree_title: formItem.classId, pid_tree_class: 13, }"
+			submitUrl="items/item_add"
+			@submitChange="submitCallBack"
+		>
+		</new-form>
+		
+		<goods-list ref="goodsInstance" style="margin-top:16px;"></goods-list>
 		
 	</div>
 	
 </template>
 
 <script>
-	
-import formMod from '@/components/form.vue';
-	
+
+import newForm from '@/components/new-form.vue';
+
+import goodsList from '@/views/goodsAdmin/goodsList.vue';
+
 export default {
 	components:{//模板
-		formMod,
+		newForm,
+		goodsList,
 	},
     data () {//数据
         return {
         	
         	goodsClassList: [],//物品分类数据列表
         	
-        	addSizeList: [],//物品规格表单
-        	
-        	addGoods: {//表单值
+        	formItem: {//表单值
         		name: '',
         		classId: '',
         	},
         	
-        	articleRules:{//表单验证
-				name:[
+        	ruleItem: {//表单验证
+				name: [
                     { required: true, message: '请输入物品名称', trigger: 'blur' }
                 ],
-				classId:[
+				classId: [
                     { type: 'number', required: true, message: '请选择物品分类', trigger: 'change' }
                 ],
 			},
 			
 			autoDataList: [],//自动完成数据列表
 			
-			formDatas:[],//表单数据
-			
-			old:'',//旧的值
-			
-			inputVal:'',//input值
+			formsShow: false,//规格显示
 			
         }
     },
@@ -142,7 +134,7 @@ export default {
 				});
 				
 				if(response.data.length > 0){
-					this.addGoods.classId = response.data[0].id;
+					this.formItem.classId = response.data[0].id;
 				}
 				
 			})
@@ -152,106 +144,6 @@ export default {
 				
     	},
     	
-    	addSize(name){//添加物品规格
-    		
-    		this.$refs[name].validate((valid) => {
-            	
-                if (valid) {
-                	
-                	this.$axios.post('system/formTable_add', {
-		    			pid: 0,
-		    			name: "规格",
-		    			model: 1,
-		    			add_type: 2,
-					})
-					.then(response => {
-						
-						this.addSizeList.push({
-							name: response.data.name,
-							id: response.data.id,
-						});
-						
-						console.log(this.addSizeList);
-						
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
-					
-                }
-                
-            })
-			
-    	},
-    	edit(obj,index){//编辑规格名称
-    		
-			if(!obj.editable){//编辑
-				
-				this.inputVal = obj.name;
-				
-				if(this.old !== ''){
-					this.addSizeList[this.old].editable = false;
-				}
-				
-				this.old = index;
-				
-				obj.editable = true;
-				
-			}else{//保存
-				
-				if(obj.name !== this.inputVal){
-					
-					obj.name = this.inputVal;
-					
-					this.$axios.post('system/formTable_edit', {
-		        		id: obj.id,
-		        		name: this.inputVal,
-		        		edit_type: 2,
-					})
-					.then(response => {
-						
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
-					
-				}
-				
-				obj.editable = false;
-				
-			}
-			
-			this.addSizeList = JSON.parse(JSON.stringify(this.addSizeList));
-			
-    	},
-    	cancel(obj){//取消
-    		
-    		obj.editable = false;
-    		
-    	},
-    	delSize(id){//删除规格
-    		
-    		this.$axios.post('system/formTable_delete', {
-        		id:id,
-        		delete_type: 2,
-			})
-			.then(response => {
-				
-				this.addSizeList.forEach((item,index,arr) => {
-					if(item.id == id){
-						arr.splice(index,1);
-					}
-				});
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
-    	},
-    	inputChange(ev){//文本框数据改变时
-    		this.inputVal = ev.target.value;
-    	},
     	
     	
     	//====================================================
@@ -293,107 +185,43 @@ export default {
         	
 			
         },
+        
         //=====================================================
-        formEvent(){//数据改变时
-        	let arr = [];
-        	this.$refs.modInstance.forEach(item => {
-        		arr.push(...item.formDynamic.data)
-        	});
-        	this.formDatas = arr;
-        },
+        
         add(name) {//添加物品
     		
             this.$refs[name].validate((valid) => {
             	
                 if (valid) {
                 	
-		        	if(this.$refs.modInstance && this.$refs.modInstance.length > 0){//有规格
-		        		
-		        		let num1 = 0;
-		        		
-						let num2 = 0;
-		        		
-		        		this.$refs.modInstance.forEach((item) => {
-							item.$refs.formDynamic.validate((valid) => {
-								num1++;
-								if(valid){
-									num2++;
-								}
-					        })
-			        	});
-		        	
-			        	if(num1 === num2){
-			        		
-			        		let fields = JSON.stringify(this.formDatas);//转字符串
-		        			
-			        		let dataFormTableIds = [];
-			        		
-			        		this.addSizeList.forEach(item => {
-			        			dataFormTableIds.push(item.id);
-			        		});
-			        		
-			        		let Ids = dataFormTableIds.join(',');
-			        		
-			        		let info = {
-			        			name: this.addGoods.name,
-			        			pid_tree_title: this.addGoods.classId,
-			        			dataFormTable_ids: Ids,
-			        			pid_tree_class: 13,
-			        		}
-			        		
-			        		//=====================================================
-			        		this.$axios.post('items/item_add', {
-		        				fields: fields,
-				        		info: JSON.stringify(info),
-				        		number: 0,
-							})
-							.then((response) => {
-								if(response.code === 1){
-									this.addGoods.name = '';
-									this.addSizeList = [];//清空临时数据
-									this.formDatas = [];//清空临时数据
-									
-									this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
-									
-									this.$Message.success('添加成功!');
-								}
-							})
-							.catch(error => {
-								console.log(error);
-							});
-			        		
-			        	}
-		        		
-		        	}else{//没有规格
-		        		
-		        		let info = {
-		        			name:this.addGoods.name,
-		        			pid_tree_title:this.addGoods.classId,
-		        			dataFormTable_ids:"",
-		        			pid_tree_class: 13,
-		        		}
-		        		
-		        		this.$axios.post('items/item_add', {
-			        		info:JSON.stringify(info),
-			        		number: 0,
-						})
-						.then((response) => {
-							if(response.code === 1){
-								this.addGoods.name = '';
-								this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
-								this.$Message.success('添加成功!');
-							}
-						})
-						.catch(error => {
-							console.log(error);
-						});
+	        		let info = {
+	        			name:this.formItem.name,
+	        			pid_tree_title:this.formItem.classId,
+	        			pid_tree_class: 13,
+	        		}
+	        		
+	        		this.$axios.post('items/item_add', {
+		        		info:JSON.stringify(info),
+					})
+					.then((response) => {
+						if(response.code === 1){
+							this.formItem.name = '';
+							this.$refs.goodsInstance.$refs.tabInstance.getDataList(this.$refs.goodsInstance.$refs.tabInstance.stateInfo);//获取数据列表
+							this.$Message.success('添加成功!');
+						}
+					})
+					.catch(error => {
+						console.log(error);
+					});
 						
-		        	}
-		        	
                 }
                 
             });
             
+        },
+        
+        submitCallBack(){//提交回调
+			this.$refs.goodsInstance.$refs.tabInstance.getDataList(this.$refs.goodsInstance.$refs.tabInstance.stateInfo);//获取数据列表
         },
         
     },
@@ -404,7 +232,9 @@ export default {
     	
 	},
     mounted(){//模板被渲染完毕之后执行
+    	
     	this.articleClass();//物品分类数据列表
+    	
 	},
     watch:{//监测数据变化
 		
