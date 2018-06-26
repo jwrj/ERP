@@ -4,7 +4,17 @@
 		
 		<Card>
 			
-			<Table border :columns="columns1" :data="data1"></Table>
+			<h1 slot="title">成品列表</h1>
+			
+			<div style="padding:16px;">
+				
+				<Table border :columns="columns1" :data="data1"></Table>
+			
+				<div style="padding:16px 0;display:flex;">
+					<Page style="margin-left: auto;" show-total :page-size="pageSize" :current="current" :total="total" @on-change="pageChange"></Page>
+				</div>
+				
+			</div>
 			
 		</Card>
 		
@@ -36,9 +46,7 @@
 	    	
 	    	<p slot="header">配置列表</p>
 	        <div>
-	        	
 	        	<Table border :columns="columns2" :data="data2"></Table>
-	        	
 	        </div>
 	        <div slot="footer">
 	            <Button @click="modalShow2 = false">关闭</Button>
@@ -68,7 +76,7 @@ export default {
         	
         	modalShow2: false,
         	
-        	partsList: [],
+        	partsList: [],//配置ID集合
         	
         	columns1: [
         		{
@@ -84,9 +92,7 @@ export default {
         		{
         			title: '配置ID',
                     render: (h, params) => {
-                    	console.log();
                     	return h('div',params.row.extend_data[0].parts);
-                    	
                     }
         		},
         		{
@@ -109,6 +115,10 @@ export default {
 	                           			_this.configurationID = params.row.id;
 	                           			_this.configurationName = params.row.name;
 	                           			_this.modalShow = true;
+										
+//										_this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
+										_this.showSelect(params.row.extend_data[0].parts);//显示以勾选的数据
+										
 	                           		}
 	                           }
 	        				},'点击配置'),
@@ -124,13 +134,10 @@ export default {
 	                           on: {
 	                           		click(){
 	                           			
-	                           			let str = params.row.extend_data[0].parts;
-	                           			
-	                           			if(str){
-	                           				_this.partsList = str.split(',');
-	                           			}
-	                           			
 	                           			_this.modalShow2 = true;
+	                           			
+	                           			_this.showConfiguration(params.row.extend_data[0].parts);
+	                           			
 	                           		}
 	                           }
 	        				},'查看配置')
@@ -153,7 +160,7 @@ export default {
                 },
         		{
         			align:'center',
-        			width:70,
+        			width:100,
         			title: 'ID',
                     key: 'id',
         		},
@@ -193,7 +200,16 @@ export default {
         	//=========================================================
         	
         	columns2: [
-        		
+        		{
+        			align:'center',
+        			width:100,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '物品名称',
+                    key: 'name',
+        		},
         	],
         	
         	data2: [],
@@ -206,20 +222,31 @@ export default {
         	
         	seleData: [],
         	
+        	total: 0,
+        	
+        	pageSize: 0,
+        	
+        	current: 1,
+        	
         }
     },
     methods: {//方法
     	
-    	getTabelData(){//获取成品列表
+    	getTabelData(current_page){//获取成品列表
     		
     		this.$axios.post('items/item_list', {
     			where: '{ "pid_tree_title": ["=",24] }',
-    			page: 1,
+    			page: current_page,
     			pageSize: 10,
+    			order:'{"id":"desc"}',
 			})
 			.then(response => {
 				
-				this.data1 = response.data.dataList.data
+				this.total = response.data.dataList.total;
+				
+				this.pageSize = Number(response.data.dataList.per_page);
+				
+				this.data1 = response.data.dataList.data;
 
 			})
 			.catch(function (error) {
@@ -231,8 +258,10 @@ export default {
     		
     		this.seleData = data;
     		
+    		console.log(this.seleData);
+    		
     	},
-    	submit(){
+    	submit(){//提交配置
     		
     		let info = {
     			id: this.configurationID,
@@ -258,6 +287,8 @@ export default {
 			})
 			.then(response => {
 				
+				this.getTabelData(this.current);//获取成品列表
+				
 				this.modalShow = false;
 				
 			})
@@ -266,14 +297,103 @@ export default {
 			});
     		
     	},
-    	close(){
+    	close(){//关闭配置
     		
     		this.modalShow = false;
     		
     	},
-    	showConfiguration(){
+    	showConfiguration(str){//点击查看配置
     		
-    		this.partsList
+    		let where = ["or"];
+    		
+    		this.data2 = [];
+    		
+    		if(str){
+    			
+   				let partsList = str.split(',');
+   				
+	    		partsList.forEach(item => {
+	    			
+	    			where.unshift(["=",item]);
+	    			
+	    		})
+	    		
+	    		this.$axios.post('items/item_list', {
+	    			where: '{ "id": '+ JSON.stringify(where) +' }',
+	    			page: 1,
+	    			pageSize: 99999,
+				})
+				.then(response => {
+					
+					this.data2 = response.data.dataList.data;
+					
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+				
+   			}
+    		
+    	},
+    	showSelect(str){//显示以勾选的数据
+    		
+    		let where = ["or"];
+    		
+    		this.$refs.tabInstance.checkedData = [];
+    		
+    		this.$refs.tabInstance.selectedNum = 0;//已选条数
+    		
+    		if(str){
+    			
+   				let partsList = str.split(',');
+   				
+	    		partsList.forEach(item => {
+	    			
+	    			where.unshift(["=",item]);
+	    			
+	    		})
+	    		
+	    		this.$axios.post('items/item_list', {
+	    			where: '{ "id": '+ JSON.stringify(where) +' }',
+	    			page: 1,
+	    			pageSize: 99999,
+				})
+				.then(response => {
+					
+					response.data.dataList.data.forEach(item => {
+						item._checked = true;
+					})
+					
+					this.$refs.tabInstance.checkedData = response.data.dataList.data;
+					
+					this.$refs.tabInstance.stateInfo.page = 1;
+					
+					this.$refs.tabInstance.setRoutePara();
+					
+					this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);
+					
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+				
+   			}else{
+   				
+   				this.$refs.tabInstance.stateInfo.page = 1;
+				
+				this.$refs.tabInstance.setRoutePara();
+   				
+   				this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);
+   				
+   			}
+    		
+    		
+    	},
+    	pageChange(currentPage){//页码发生改变时
+    		
+    		this.current = currentPage;
+    		
+    		this.getTabelData(currentPage);//获取成品列表
     		
     	},
     	
@@ -286,7 +406,7 @@ export default {
 	},
     mounted(){//模板被渲染完毕之后执行
     	
-    	this.getTabelData();//获取成品列表
+    	this.getTabelData(this.current);//获取成品列表
     	
 	},
     watch:{//监测数据变化

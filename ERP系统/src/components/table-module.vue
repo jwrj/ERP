@@ -1182,6 +1182,7 @@ export default {
 	    	console.log('页码信息发生了变化');
 	    	
 	    	if(this.checkedData.length > 0){//选项状态
+	    		
 	    		this.tabDataList.forEach(item1 => {
 	    			this.checkedData.forEach(item2 => {
 	    				if(item1.id == item2.id){
@@ -1189,6 +1190,17 @@ export default {
 	    				}
 	    			});
 	    		});
+	    		
+	    		let num = 0;
+	    		
+	    		this.checkedData.forEach(item3 => {
+	    			if(item3._checked){
+	    				num++;
+	    			}
+	    		});
+	    		
+	    		this.selectedNum = num;
+	    		
 	    	}
 	    	
 	    	if(this.stateInfo.page > newVal.lastPage){//筛选时当前的页码大于最后一页的页码时执行
