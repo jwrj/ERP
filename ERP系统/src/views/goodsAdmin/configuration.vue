@@ -36,7 +36,7 @@
 				</table-module>
 	        </div>
 	        <div slot="footer">
-	            <Button type="primary" @click="submit">确定配置</Button>
+	            <Button type="primary" @click="submit">提交</Button>
 	            <Button @click="close">关闭</Button>
 	        </div>
 	    </Modal>
@@ -44,7 +44,7 @@
 	    
 	    <Modal v-model="modalShow2" width="80%">
 	    	
-	    	<p slot="header">配置列表</p>
+	    	<p slot="header">配件列表</p>
 	        <div>
 	        	<Table border :columns="columns2" :data="data2"></Table>
 	        </div>
@@ -121,12 +121,13 @@ export default {
 										
 	                           		}
 	                           }
-	        				},'点击配置'),
+	        				},'设置配件'),
 	        				
         					h('Button',{
 	        					props: {
 	                                type: 'success',
-	                                size: 'small'
+	                                size: 'small',
+	                                disabled: params.row.extend_data[0].parts ? false : true,
 	                           },
 	                           style: {
 	                           		marginLeft: '4px',
@@ -140,7 +141,7 @@ export default {
 	                           			
 	                           		}
 	                           }
-	        				},'查看配置')
+	        				},'查看配件')
         				
         				]);
         				
@@ -177,7 +178,7 @@ export default {
                     }
         		},
         		{
-        			title: '物品其它信息',
+        			title: '物品参数',
                     render: (h, params) => {
 							
 						let str = '';

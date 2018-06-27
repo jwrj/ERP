@@ -8,9 +8,13 @@
 		<div v-if="screenTop" style="display:flex;margin-bottom:10px;">
 			<!--日期-->
 			<DatePicker v-if="dateScreen" :value="screenVal.date" @on-change="formattedDate" type="daterange" placeholder="选择时间" style="margin-right:10px;"></DatePicker>
-			<!--下拉-->
+			<!--状态下拉列表-->
 		    <Select v-if="cityList.length > 1" :value="screenVal.orderStatus" @on-change="dropSele" style="width:200px;margin-right:10px;">
 		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+		    </Select>
+			<!--客户下拉列表-->
+		    <Select v-if="clientSelect" :value="screenVal.client" @on-change="clientChange" placeholder="选择客户" style="width:200px;margin-right:10px;">
+		        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 		    <!--搜索框-->
 			<Input class="seekBox" v-if="searchBox" @on-click="seekBut" @on-enter="seekBut" v-model="screenVal.seekTxtVal" placeholder="搜索名称" icon="ios-search" style="width:300px;margin-left:auto;"></Input>
@@ -436,9 +440,8 @@ export default {
 	 		default: 'ordinaryDel',
 	 	},
 	 	
-	 	//========================================================
+	 	//======================控件开关==================================
 	 	
-	 	//控件开关
 	 	screenTop:{//整个筛选栏
 	 		type: Boolean,
 	 		default: true,
@@ -462,6 +465,11 @@ export default {
 	 	pagingBox:{//分页控件
 	 		type: Boolean,
 	 		default: true,
+	 	},
+	 	
+	 	clientSelect:{//客户下拉列表
+	 		type: Boolean,
+	 		default: false,
 	 	},
 	 	
 	},
@@ -492,6 +500,8 @@ export default {
         	pageNumInfo: {},//页码信息
         	
         	cityList: [],//下拉数据
+        	
+        	clientList: [],//客户列表
         		
             stateInfo:{//状态信息
             	page:1,
@@ -502,6 +512,7 @@ export default {
             	date:[],//日期
             	orderStatus:0,//下拉
             	seekTxtVal:'',//搜索框值
+            	client: '',//客户ID
             },
             
             checkedData: [],//已选中数据列表
@@ -728,6 +739,13 @@ export default {
     		this.setRoutePara();//设置路由参数
     		
     	},
+    	clientChange(val){//客户选择
+    		
+    		this.stateInfo.client = val;
+    		
+    		this.setRoutePara();//设置路由参数
+    		
+    	},
     	seekBut(){//搜索按钮
     		
     		this.stateInfo.seek = this.screenVal.seekTxtVal;
@@ -930,14 +948,27 @@ export default {
     		}
     		
     		if(query.orderStatus){//下拉
+    			
     			console.log('下拉');
+    			
 				this.screenVal.orderStatus = Number(query.orderStatus);
 
 				this.stateInfo.orderStatus = Number(query.orderStatus);
 				
     		}
     		
+    		if(query.client){//客户列表
+    			
+    			console.log('客户列表');
+    			
+				this.screenVal.client = Number(query.client);
+
+				this.stateInfo.client = Number(query.client);
+				
+    		}
+    		
     		if(query.seek !== undefined){//搜索框
+    			
     			console.log('搜索框');
     			
     			this.stateInfo.seek = query.seek;
@@ -959,6 +990,36 @@ export default {
     	},
     	
     	//====================================================================
+    	
+    	getClient(){//获取客户列表
+    		
+    		this.$axios.post('oa/customer_list', {
+    			where: '{ "pid_tree_title":  ["=","2"] }',
+    			page: 1,
+    			pageSize: 99999,
+    			order:'{"id":"desc"}',
+			})
+			.then(response => {
+				
+				let arr = [];
+				
+				response.data.dataList.data.forEach(item => {
+					
+					arr.push({
+						label: item.name,
+						value: item.id,
+					});
+					
+				})
+				
+				this.clientList = arr;
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+    		
+    	},
     	
     	getDataList(stateInfo){//获取数据列表
     		
@@ -1020,13 +1081,15 @@ export default {
         		
         		status_class:this.stateListId,//下拉状态列表
         		
-        		DBname_dataPage: this.DBnameDataPage ? this.DBnameDataPage : '',
+        		DBname_dataPage: this.DBnameDataPage ? this.DBnameDataPage : '',//万能列表用到的字段，填写基础表
         		
-        		DBname_show_extend: this.DBnameShowExtend ? this.DBnameShowExtend : '',
+        		DBname_show_extend: this.DBnameShowExtend ? this.DBnameShowExtend : '',//是否显示详情页的数据
         		
-        		warehousing_user_id: '',
+        		warehousing_user_id: this.clientSelect ? stateInfo.client : '',//需要检索的客户ID
         		
-        		warehousing_action_type: '',
+        		warehousing_action_type: this.clientSelect ? 1 : '',//出库或入库，1：出库，2：入库
+        		
+        		warehousingFinal: '',//统计客户的总库存
         		
 			})
 			.then((response) => {
@@ -1154,6 +1217,10 @@ export default {
     mounted(){//模板被渲染完毕之后执行
     	
     	this.getDataList(this.stateInfo);//获取数据列表
+    	
+    	if(this.clientSelect){
+    		this.getClient();//获取客户列表
+    	}
     	
     },
     

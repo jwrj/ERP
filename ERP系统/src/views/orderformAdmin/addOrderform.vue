@@ -73,6 +73,7 @@
 					:columns-list="columns"
 					:pidTreeClassId="13"
 					stateListId="13"
+					:clientSelect="true"
 					
 					tableDataUrl="items/item_list"
 					seleSeekField="pid_tree_title"
@@ -98,6 +99,17 @@
     		</new-form>
     	</div>
 	    
+	    <Modal v-model="modalShow2" width="80%">
+	    	
+	    	<p slot="header">配件列表</p>
+	        <div>
+	        	<Table border :columns="columns2" :data="data2"></Table>
+	        </div>
+	        <div slot="footer">
+	            <Button @click="modalShow2 = false">关闭</Button>
+	        </div>
+	    	
+	    </Modal>
 	    
 	</div>
 </template>
@@ -121,6 +133,26 @@ export default {
 	data(){
 		return {
 			
+			//==============弹窗配件数据=================
+        	
+        	modalShow2: false,
+        	
+        	columns2: [
+        		{
+        			align:'center',
+        			width:100,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '物品名称',
+                    key: 'name',
+        		},
+        	],
+        	
+        	data2: [],
+        	
+        	//======================================
 			
 			columns: [
         		{
@@ -140,14 +172,24 @@ export default {
         		},
         		{
         			align:'center',
+        			width:100,
+        			title: '客户库存',
+                    render: (h, params) => {
+                    	
+                    	return h('span',params.row.warehousingFinal);
+						
+                    }
+        		},
+        		{
+        			align:'center',
         			width:80,
-        			title: '库存数',
+        			title: '总库存',
                     render: (h, params) => {
 						return h('span',params.row.extend_data[0].number)
                     }
         		},
         		{
-        			title: '物品其它信息',
+        			title: '物品参数',
                     render: (h, params) => {
 							
 						let str = '';
@@ -165,6 +207,36 @@ export default {
 						return h('div',str)
 					},
         		},
+        		{
+                	title: '配件',
+                	align:'center',
+                	width:100,
+                	render: (h, params) => {
+                		
+                		let _this = this;
+                		
+                		return h('Button',{
+        					props: {
+                                type: 'success',
+                                size: 'small',
+                                disabled: params.row.extend_data[0].parts ? false : true,
+                           },
+                           style: {
+                           		marginLeft: '4px',
+                           },
+                           on: {
+                           		click(){
+                           			
+                           			_this.modalShow2 = true;
+                           			
+                           			_this.showConfiguration(params.row.extend_data[0].parts);
+                           			
+                           		}
+                           }
+        				},params.row.extend_data[0].parts ? '查看配件' : '无配件');
+                		
+                	}
+                },
         	],
         	
         	//===========================================
@@ -325,6 +397,39 @@ export default {
 				name:'clientList',
 			});
 		},
+		showConfiguration(str){//点击查看配置
+    		
+    		let where = ["or"];
+    		
+    		this.data2 = [];
+    		
+    		if(str){
+    			
+   				let partsList = str.split(',');
+   				
+	    		partsList.forEach(item => {
+	    			
+	    			where.unshift(["=",item]);
+	    			
+	    		})
+	    		
+	    		this.$axios.post('items/item_list', {
+	    			where: '{ "id": '+ JSON.stringify(where) +' }',
+	    			page: 1,
+	    			pageSize: 99999,
+				})
+				.then(response => {
+					
+					this.data2 = response.data.dataList.data;
+					
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+				
+   			}
+    		
+    	},
 	},
 	computed:{//计算属性
         
