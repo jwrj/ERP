@@ -131,6 +131,45 @@ export default {
 					},
         		},
         		{
+                	title: '出入库记录',
+                	align:'center',
+                	width:100,
+                	render: (h, params) => {
+                		
+                		return h('div',[
+                		
+                			h('Button',{
+                				props: {
+                					type: 'primary',
+                					size: 'small',
+                				},
+                				on: {
+                           			click(){
+                           				
+                           			}
+                           		},
+                			},'出'),
+                			
+                			h('Button',{
+                				props: {
+                					type: 'primary',
+                					size: 'small',
+                				},
+                				style: {
+                					marginLeft: '4px',
+                				},
+                				on: {
+                           			click(){
+                           				
+                           			}
+                           		},
+                			},'入')
+                		
+                		]);
+                		
+                	}
+                },
+        		{
                 	title: '配件',
                 	align:'center',
                 	width:100,
@@ -207,14 +246,30 @@ export default {
     	
     	warehouseRecord(goods_id,action_type){//出入库记录
     		
+    		let where = {
+    			item_id: ["=",goods_id],
+    			action_type: ["=" , action_type],
+    		}
+    		
+    		let views = [
+    		
+    			[ "extend_warehousing", "id, pid_data_page, item_id, number, action_type", "", "" ],
+    			
+    			[ "data_page", "name", "data_page.id = extend_warehousing.pid_data_page", "" ]
+    			
+    		];
+    		
+    		
     		this.$axios.post('system/views', {
     			page: 1,
     			pageSize: 10,
-    			where: '{  "item_id" :  ["=","1"] , "action_type" :  [  "=" , 1 ]  }',
+    			where: JSON.stringify(where),
     			order:'{"id":"desc"}',
-    			views: '[  [  "extend_warehousing"  ,  " id  ,  pid_data_page  ,  item_id  ,  number  ,  action_type "  ,"" , ""  ],  [  "data_page" , "name" , " data_page.id = extend_warehousing.pid_data_page " , ""   ] , [  {"data_page" : "B" } , {"name": "name2"} , " B.id = extend_warehousing.item_id " , ""   ] ]',
+    			views: JSON.stringify(views),
 			})
 			.then(response => {
+				
+				console.log(response.data);
 				
 			})
 			.catch(function (error) {
