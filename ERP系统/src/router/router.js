@@ -149,6 +149,105 @@ export const appRouter = [
         ]
     },
     {
+    	path:'/productionAdmin',
+        icon:'social-buffer',
+        name:'productionAdmin',
+        title:'生产管理',
+        component: Frame,
+        children: [
+//          {
+//              path:'Pconfiguration',
+//              name:'Pconfiguration',
+//              title:'生产配置',
+//              component: resolve => { require(['@/views/productionAdmin/Pconfiguration.vue'], resolve); }
+//          },
+//          {
+//              path:'productionList',
+//              name:'productionList',
+//              title:'生产列表',
+//              component: resolve => { require(['@/views/productionAdmin/productionList.vue'], resolve); }
+//          },
+            {
+                path:'picking',
+                name:'picking',
+                title:'领料',
+                component: resolve => { require(['@/views/productionAdmin/picking.vue'], resolve); }
+            },
+            {
+                path:'pickingList',
+                name:'pickingList',
+                title:'领料单',
+                component: resolve => { require(['@/views/productionAdmin/pickingList.vue'], resolve); }
+            },
+        ]
+    },
+    {
+    	path:'/delivergoods',
+        icon:'clipboard',
+        name:'delivergoods',
+        title:'发货管理',
+        component: Frame,
+        children: [
+            {
+                path:'orderDelivergoods',
+                icon:'clipboard',
+                name:'orderDelivergoods',
+                title:'订单发货',
+                component: resolve => { require(['@/views/delivergoods/orderDelivergoods.vue'], resolve); }
+            },
+            {
+                path:'delivergoodsList',
+                icon:'clipboard',
+                name:'delivergoodsList',
+                title:'发货单列表',
+                component: resolve => { require(['@/views/delivergoods/delivergoodsList.vue'], resolve); }
+            },
+        ]
+    },
+    {
+    	path:'/warehouseAdmin',
+        icon:'arrow-swap',
+        name:'warehouseAdmin',
+        title:'出入库管理',
+        component: Frame,
+        children: [
+            {
+                path:'enterWarehouse',
+                name:'enterWarehouse',
+                title:'入库管理',
+                component: resolve => { require(['@/views/warehouseAdmin/enterWarehouse.vue'], resolve); }
+            },
+            {
+                path:'comeWarehouse',
+                name:'comeWarehouse',
+                title:'出库管理',
+                component: resolve => { require(['@/views/warehouseAdmin/comeWarehouse.vue'], resolve); }
+            },
+            {
+                path:'warehouseList',
+                name:'warehouseList',
+                title:'出入库列表',
+                component: resolve => { require(['@/views/warehouseAdmin/warehouseList.vue'], resolve); }
+            },
+        ]
+    },
+    {
+    	path:'/billEdit',
+        icon:'ios-paper-outline',
+        name:'billEdit',
+        title:'账单编辑',
+        component: Frame,
+        children: [
+            {
+                path:'billEdit-1',
+                icon:'ios-paper-outline',
+                name:'billEdit-1',
+                title:'账单编辑',
+                component: resolve => { require(['@/views/billEdit/billEdit-1.vue'], resolve); }
+            },
+        ]
+    },
+    {
     	path:'/goodsAdmin',
         icon:'cube',
         name:'goodsAdmin',
@@ -203,96 +302,23 @@ export const appRouter = [
         ]
     },
     {
-    	path:'/warehouseAdmin',
-        icon:'arrow-swap',
-        name:'warehouseAdmin',
-        title:'出入库管理',
+    	path:'/addressAdmin',
+        icon:'person-stalker',
+        name:'addressAdmin',
+        title:'送货地址管理',
         component: Frame,
         children: [
             {
-                path:'enterWarehouse',
-                name:'enterWarehouse',
-                title:'入库管理',
-                component: resolve => { require(['@/views/warehouseAdmin/enterWarehouse.vue'], resolve); }
+                path:'address',
+                name:'address',
+                title:'新增地址',
+                component: resolve => { require(['@/views/addressAdmin/address.vue'], resolve); }
             },
             {
-                path:'comeWarehouse',
-                name:'comeWarehouse',
-                title:'出库管理',
-                component: resolve => { require(['@/views/warehouseAdmin/comeWarehouse.vue'], resolve); }
-            },
-            {
-                path:'warehouseList',
-                name:'warehouseList',
-                title:'出入库列表',
-                component: resolve => { require(['@/views/warehouseAdmin/warehouseList.vue'], resolve); }
-            },
-        ]
-    },
-    {
-    	path:'/productionAdmin',
-        icon:'social-buffer',
-        name:'productionAdmin',
-        title:'生产管理',
-        component: Frame,
-        children: [
-            {
-                path:'Pconfiguration',
-                name:'Pconfiguration',
-                title:'生产配置',
-                component: resolve => { require(['@/views/productionAdmin/Pconfiguration.vue'], resolve); }
-            },
-            {
-                path:'productionList',
-                name:'productionList',
-                title:'生产列表',
-                component: resolve => { require(['@/views/productionAdmin/productionList.vue'], resolve); }
-            },
-        ]
-    },
-//  {
-//  	path:'/delivergoods',
-//      icon:'clipboard',
-//      name:'delivergoods',
-//      title:'发货管理',
-//      component: Frame,
-//      children: [
-//          {
-//              path:'orderDelivergoods',
-//              icon:'clipboard',
-//              name:'orderDelivergoods',
-//              title:'订单发货',
-//              component: resolve => { require(['@/views/delivergoods/orderDelivergoods.vue'], resolve); }
-//          },
-//          {
-//              path:'customDelivergoods',
-//              icon:'clipboard',
-//              name:'customDelivergoods',
-//              title:'自定义发货',
-//              component: resolve => { require(['@/views/delivergoods/customDelivergoods.vue'], resolve); }
-//          },
-//          {
-//              path:'delivergoodsList',
-//              icon:'clipboard',
-//              name:'delivergoodsList',
-//              title:'发货单列表',
-//              component: resolve => { require(['@/views/delivergoods/delivergoodsList.vue'], resolve); }
-//          },
-//      ]
-//  },
-    {
-    	path:'/billEdit',
-        icon:'ios-paper-outline',
-        name:'billEdit',
-        title:'账单编辑',
-        component: Frame,
-        children: [
-            {
-                path:'billEdit-1',
-                icon:'ios-paper-outline',
-                name:'billEdit-1',
-                title:'账单编辑',
-                component: resolve => { require(['@/views/billEdit/billEdit-1.vue'], resolve); }
+                path:'addressList',
+                name:'addressList',
+                title:'地址列表',
+                component: resolve => { require(['@/views/addressAdmin/addressList.vue'], resolve); }
             },
         ]
     },

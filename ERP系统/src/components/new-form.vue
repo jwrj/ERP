@@ -221,7 +221,7 @@ export default {
 		        		let info = {
 		        			name:this.$parent.formItem.name,
 		        			pid_tree_title:this.pageId,
-		        			use_dataPage_ids: this.useDataPageIdArr.length > 0 ? JSON.stringify([this.useDataPageIdArr]) : null,
+		        			use_dataPage_ids: this.useDataPageIdArr.length > 0 ? JSON.stringify(this.useDataPageIdArr) : null,
 		        		}
 		        		
 		        		let infoString = JSON.stringify(info);
@@ -352,7 +352,7 @@ export default {
 		this.getTemplate();//获取模板列表
 		
 		bus.$on('viewWatch',(val)=>{//监听器
-			this.useDataPageIdArr = val;
+			this.useDataPageIdArr.push(val);
 		});
 		
 	}

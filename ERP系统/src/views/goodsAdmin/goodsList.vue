@@ -30,6 +30,7 @@
 		
 		</Card>
 		
+		<!--配件列表弹窗-->
 		<Modal v-model="modalShow2" width="80%">
 	    	
 	    	<p slot="header">配件列表</p>
@@ -38,6 +39,19 @@
 	        </div>
 	        <div slot="footer">
 	            <Button @click="modalShow2 = false">关闭</Button>
+	        </div>
+	    	
+	    </Modal>
+	    
+	    <!--记录列表弹窗-->
+		<Modal v-model="modalShow3" width="80%">
+	    	
+	    	<p slot="header">记录列表</p>
+	        <div>
+	        	<Table border :columns="columns3" :data="data3"></Table>
+	        </div>
+	        <div slot="footer">
+	            <Button @click="modalShow3 = false">关闭</Button>
 	        </div>
 	    	
 	    </Modal>
@@ -60,7 +74,7 @@ export default {
     data () {//数据
         return {
         	
-        	//==============弹窗配件数据=================
+        	//==============配件弹窗数据=================
         	
         	modalShow2: false,
         	
@@ -79,7 +93,26 @@ export default {
         	
         	data2: [],
         	
-        	//======================================
+        	//==============出入库记录弹窗数据=================
+        	
+        	modalShow3: false,
+        	
+        	columns3: [
+        		{
+        			align:'center',
+        			width:100,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '名称',
+                    key: 'name',
+        		},
+        	],
+        	
+        	data3: [],
+        	
+        	//================物品数据======================
         	
         	columns: [
         		{
@@ -136,6 +169,8 @@ export default {
                 	width:100,
                 	render: (h, params) => {
                 		
+                		let _this = this;
+                		
                 		return h('div',[
                 		
                 			h('Button',{
@@ -145,7 +180,7 @@ export default {
                 				},
                 				on: {
                            			click(){
-                           				
+                           				_this.warehouseRecord(params.row.id,2);//出入库记录
                            			}
                            		},
                 			},'出'),
@@ -160,7 +195,7 @@ export default {
                 				},
                 				on: {
                            			click(){
-                           				
+                           				_this.warehouseRecord(params.row.id,1);//出入库记录
                            			}
                            		},
                 			},'入')
@@ -246,6 +281,8 @@ export default {
     	
     	warehouseRecord(goods_id,action_type){//出入库记录
     		
+    		this.modalShow3 = true;
+    		
     		let where = {
     			item_id: ["=",goods_id],
     			action_type: ["=" , action_type],
@@ -259,17 +296,16 @@ export default {
     			
     		];
     		
-    		
     		this.$axios.post('system/views', {
     			page: 1,
-    			pageSize: 10,
+    			pageSize: 99999,
     			where: JSON.stringify(where),
     			order:'{"id":"desc"}',
     			views: JSON.stringify(views),
 			})
 			.then(response => {
 				
-				console.log(response.data);
+				this.data3 = response.data.dataList.data;
 				
 			})
 			.catch(function (error) {

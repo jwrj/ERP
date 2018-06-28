@@ -371,6 +371,8 @@
 					
 					this.dataList = arr;
 					
+					console.log(response);
+					
 					this.useDataPageIds[0] = response.data.pid_tree_title;//数据所属的树标题id
 					
 					this.useDataPageIds[1] = response.data.id;//数据页自己的id

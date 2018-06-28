@@ -38,7 +38,6 @@
     		
     	</Card>
     	
-    	
     	<Card style="margin-top:15px;">
     		
     		<h1 slot="title">订单物品</h1>
@@ -90,6 +89,7 @@
     	
     	<div style="margin-top:15px;">
     		<new-form
+    			ref="newFormInstance"
     			:pid-tree-class="4"
     			:pageId="22"
 				titleName="订单信息"
@@ -385,6 +385,7 @@ export default {
 			});
 		},
 		clientSele(id){//选择客户
+			this.$refs.newFormInstance.useDataPageIdArr = [];
 			this.$refs.viewInstance.getTitleList(id);
 		},
 		addClient(){//添加客户

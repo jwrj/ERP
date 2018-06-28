@@ -8,6 +8,7 @@
             		<!--显示文字-->
 	            	<Menu
 	            		ref="sideMenu"
+	            		:accordion="true"
 	            		:active-name="$route.name"
 	            		:open-names="openNames"
 	            		theme="dark"
