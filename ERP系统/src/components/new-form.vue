@@ -198,6 +198,8 @@ export default {
         },
         submit(){//表单提交
         	
+        	console.log(this.useDataPageIdArr);
+        	
         	let num1 = 0;
 			let num2 = 0;
 			

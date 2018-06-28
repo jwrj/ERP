@@ -40,6 +40,21 @@
     	
     	<Card style="margin-top:15px;">
     		
+    		<div slot="title">
+    			<label style="margin-right:10px;font-size: 12px;">选择送货地址</label>
+	    		<Select v-model="formItem.address" filterable placeholder="无数据" style="width:150px" @on-change="addressSele">
+			        <Option v-for="item in addressList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			    </Select>
+    		</div>
+    		
+    		<div style="padding:15px;" v-if="addressList.length > 0">
+	    		<form-view ref="viewInstance2"></form-view>
+    		</div>
+    		
+    	</Card>
+    	
+    	<Card style="margin-top:15px;">
+    		
     		<h1 slot="title">订单物品</h1>
     		
 	    	<div style="padding:16px;">
@@ -326,9 +341,16 @@ export default {
             
 			clientList: [],//客户列表
 			
+			addressList: [],//地址列表
+			
+			seleOnOff1: false,
+			
+			seleOnOff2: false,
+			
             formItem:{//名称表单值
 				name: '',
 				clientModel: '',
+				address: '',
 			},
 			
 			ruleItem:{//表单判断
@@ -360,8 +382,9 @@ export default {
     	},
 		getClient(){//获取客户列表
 			this.$axios.post('oa/customer_list', {
+				pageSize: 99999,
 				where: '{"pid_tree_title": ["=","2"]}',
-				order: '{"id":"asc"}',
+				order: '{"id":"desc"}',
 			})
 			.then(response => {
 				
@@ -374,7 +397,6 @@ export default {
 					
 				});
 				
-				
 				if(this.clientList.length > 0){
 					this.formItem.clientModel = this.clientList[0].value;
 				}
@@ -385,8 +407,23 @@ export default {
 			});
 		},
 		clientSele(id){//选择客户
+			
 			this.$refs.newFormInstance.useDataPageIdArr = [];
+			
 			this.$refs.viewInstance.getTitleList(id);
+			
+			if(this.seleOnOff1){
+				
+				setTimeout(() => {
+					this.$refs.viewInstance2.getTitleList(this.formItem.address);
+				},100);
+				
+			}else{
+				
+				this.seleOnOff1 = true;
+				
+			}
+			
 		},
 		addClient(){//添加客户
 			this.$router.replace({
@@ -397,6 +434,51 @@ export default {
 			this.$router.replace({
 				name:'clientList',
 			});
+		},
+		getAddress(){//获取地址列表
+			this.$axios.post('system/page_list', {
+				pageSize: 99999,
+				where: '{"pid_tree_title": ["=","27"]}',
+				order: '{"id":"desc"}',
+			})
+			.then(response => {
+				
+				response.data.dataList.data.forEach(item => {
+					
+					this.addressList.push({
+						label: item.name,
+						value: Number(item.id),
+					});
+					
+				});
+				
+				if(this.addressList.length > 0){
+					this.formItem.address = this.addressList[0].value;
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+		},
+		addressSele(id){//选择地址
+			
+			this.$refs.newFormInstance.useDataPageIdArr = [];
+			
+			if(this.seleOnOff2){
+				
+				this.$refs.viewInstance.getTitleList(this.formItem.clientModel);
+				
+			}else{
+				
+				this.seleOnOff2 = true;
+				
+			}
+			
+			setTimeout(() => {
+				this.$refs.viewInstance2.getTitleList(id);
+			},30);
+			
 		},
 		showConfiguration(str){//点击查看配置
     		
@@ -436,11 +518,12 @@ export default {
         
     },
     created(){
-    	
 	},
 	mounted(){
 		this.getClient();//获取客户列表
-	}
+		
+		this.getAddress();//获取地址列表
+	},
 }
 </script>
 
