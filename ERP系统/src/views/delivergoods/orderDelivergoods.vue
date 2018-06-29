@@ -4,24 +4,12 @@
 		
 		<Card>
 			
-			<h1 slot="title">发货管理</h1>
+			<h1 slot="title">订单发货</h1>
 			
 			<div style="border-bottom:1px solid #dddee1;padding:16px 0 0 16px;">
 				
 				<Form ref="formInstance1" :rules="formRules1" :model="formData" :label-width="94">
 					
-			        <FormItem label="发货方式" prop="way">
-			            <Select v-model="formData.way" @on-change="selectChange" style="width:200px">
-					        <Option v-for="item in storageWayList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-					    </Select>
-			        </FormItem>
-			        
-			        <FormItem label="发货客户" prop="client" v-if="clientList.length > 0">
-			            <Select v-model="formData.client" filterable placeholder="选择客户" style="width:150px" @on-change="clientSele">
-					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-					    </Select>
-			        </FormItem>
-			        
 			        <FormItem label="发货单名称" prop="name">
 			            <Input v-model="formData.name" clearable placeholder="输入名称..." style="width:160px;"></Input>
 			        </FormItem>
@@ -30,7 +18,7 @@
 		        
 			</div>
 			
-			<div v-if="procurementList.length > 0" style="padding:16px;border-bottom:1px solid #dddee1;">
+			<div v-if="procurementList.length > 0" style="padding:16px;">
 				
 				<h2 style="padding:0 0 10px;">点击要发货的订单</h2>
 				
@@ -44,25 +32,21 @@
 				
 			</div>
 			
-			<div style="padding:16px;">
-				
-	        	<Card>
-	        		
-	        		<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
-	        			<h2>需要发货的物品列表</h2>
-	        			<Button type="primary" size="small" @click="modalShow = true" v-show="cpmBtn">打开物品列表</Button>
-	        		</div>
-	        		
-	        		<div style="padding:16px;">
-	        			<Form class="tableFormInstance" ref="formInstance" :model="purchaseGoods" :show-message="false">
-	        				<Table border :columns="goodsColumns" :data="purchaseGoods.data"></Table>
-	        			</Form>
-	        		</div>
-	        		
-				</Card>
-				
-			</div>
-			
+		</Card>
+		
+    	<Card style="margin-top:16px;">
+    		
+    		<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
+    			<h1>需要发货的物品列表</h1>
+    			<Button type="primary" size="small" @click="modalShow = true" v-show="cpmBtn">打开物品列表</Button>
+    		</div>
+    		
+    		<div style="padding:16px;">
+    			<Form class="tableFormInstance" ref="formInstance" :model="purchaseGoods" :show-message="false">
+    				<Table border :columns="goodsColumns" :data="purchaseGoods.data"></Table>
+    			</Form>
+    		</div>
+    		
 		</Card>
 		
 		<Card style="padding:16px;margin-top:16px;text-align: center;">
@@ -107,7 +91,7 @@ export default {
     data () {//数据
         return {
         	
-        	//===========================
+        	//============物品列表数据===============
         	columns: [
         		{
                     type: 'selection',
@@ -153,6 +137,7 @@ export default {
         		},
         	],
         	
+        	//=================已选物品列表数据====================
         	goodsColumns: [//物品表头
         		{
         			align:'center',
@@ -231,18 +216,9 @@ export default {
         	
         	procurementList: [],//采购列表
         	
-        	clientList: [],//客户列表
+        	dataFormTableIds: '',//用到的表单
         	
-        	storageWayList: [//出库类型列表
-        		{
-        			label: '订单发货',
-        			value: 1,
-        		},
-        		{
-        			label: '自定义发货',
-        			value: 2,
-        		},
-        	],
+        	useDataPageIdArr: '',//其他页面数据
         	
         	purchaseGoods:{//需要购买的物品列表
         		data: []
@@ -253,21 +229,11 @@ export default {
             ],
             
             formData: {
-            	way: '',
             	name: '',
-            	client: '',
             },
             
             formRules1: {
             
-	            way: [
-                    { type: 'number', required: true, message: '请选择方式', trigger: 'change' }
-                ],
-                
-	            client: [
-                    { type: 'number', required: true, message: '请选择客户', trigger: 'change' }
-                ],
-                
                 name: [
                     { required: true, message: '请输入名称', trigger: 'blur' }
                 ],
@@ -295,11 +261,9 @@ export default {
     			
     			this.cpmBtn = false;
     			
-    			this.getProcurementList();//采购列表
+    			
     			
     		}else{
-    			
-    			this.getClient();//获取客户列表
     			
     			this.cpmBtn = true;
     			
@@ -317,12 +281,12 @@ export default {
     		
     	},
     	
-    	getProcurementList(page = 1){//采购列表
+    	getProcurementList(page = 1){//获取订单列表
     		
     		this.$axios.post('system/page_list', {
     			
     			where: '{"pid_tree_title":["=","22"]}',
-    			order: '{"id":"asc"}',
+    			order:'{"id":"desc"}',
     			DBname_extend: 'ExtendOrder',
     			page: page,
     			pageSize: 5,
@@ -349,6 +313,10 @@ export default {
     	
     	onCurrentChange(currentRow){//单击某一行时触发
     		
+    		this.dataFormTableIds = currentRow.dataFormTable_ids;//用到的表单集合
+    		
+    		this.useDataPageIdArr = currentRow.use_dataPage_ids;//其他页面数据集合
+    		
     		this.modalShow = true;
     		
     		this.cpmBtn = true;
@@ -370,47 +338,6 @@ export default {
     		this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
     		
     	},
-    	
-    	//=========================================
-    	
-    	getClient(){//获取客户列表
-			this.$axios.post('oa/customer_list', {
-				where: '{"pid_tree_title": ["=","2"]}',
-				order: '{"id":"asc"}',
-			})
-			.then(response => {
-				
-				response.data.dataList.data.forEach(item => {
-					
-					this.clientList.push({
-						label: item.name,
-						value: Number(item.id),
-						pid_tree_title: item.pid_tree_title,
-					});
-					
-				});
-				
-				
-//				if(this.clientList.length > 0){
-//					this.formData.client = this.clientList[0].value;
-//				}
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-		},
-		clientSele(id){//选择客户
-			
-			this.clientList.forEach(item => {
-				
-				if(item.value == id){
-					console.log(item);
-				}
-				
-			})
-			
-		},
     	
     	//=======================================================
     	selectAlter(data){//勾选发生改变时
@@ -465,6 +392,10 @@ export default {
     								
     								pid_tree_class: 10,
     								
+    								dataFormTable_ids: this.dataFormTableIds ? this.dataFormTableIds : null,
+    								
+    								use_dataPage_ids: this.useDataPageIdArr ? this.useDataPageIdArr : null,
+    								
     							}
 			                	
 			                	let data = [];//购买的物品列表
@@ -477,9 +408,9 @@ export default {
 				                			
 				                			item_id: item.id,//物品ID
 				                			
-				                			type_pid_tree_title: this.formData.way,//出库形式
+				                			type_pid_tree_title: 23,//出库形式
 				                			
-				                			action_type: 2,//2出库/1出库
+				                			action_type: 2,//2出库/1入库
 				                			
 		    								number: item.inputNumber,//数量
 		    								
@@ -543,9 +474,7 @@ export default {
 	},
     mounted(){//模板被渲染完毕之后执行
     	
-    	if(this.storageWayList.length > 0){
-			this.formData.way = this.storageWayList[0].value;
-		}
+    	this.getProcurementList();//获取订单列表
     	
 	},
     watch:{//监测数据变化

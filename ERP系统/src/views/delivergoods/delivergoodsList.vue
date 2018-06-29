@@ -1,53 +1,76 @@
 <template>
-
+	
 	<div>
 		
 		<Card>
 			
-		</Card>
+			<h1 slot="title">发货单列表</h1>
 			
+			<div style="padding: 15px;">
+				
+				<table-module
+					ref="tabInstance"
+					:columns-list="columns"
+					:pageId="53"
+					:pidTreeClassId="10"
+					
+					tableDataUrl="items/warehousing_list"
+					showUrl="items/warehousing_show"
+					componentViewType="formView"
+					componentEditType="formEdit"
+				>
+				</table-module>
+				
+			</div>
+			
+		</Card>
+		
 	</div>
 	
 </template>
 
 <script>
+	
+import tableModule from '@/components/table-module.vue';
+
 export default {
 	components:{//模板
-		
-	},
-	props:{
-		
-//		name: {
-//			type: Array | Number | String | Object,//类型
-//			required: true,//必传
-//			default: '',//默认值
-//		}
-		
+		tableModule,
 	},
     data () {//数据
         return {
+        	
+        	columns:[
+        		{
+        			align:'center',
+        			width:70,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '发货单名称',
+                    key: 'name',
+                    editable: true,
+        		},
+        		{
+        			title: '日期',
+                    key: 'create_time',
+        		},
+        		{
+                	title: '操作',
+                	align:'center',
+                	width:150,
+                	handle:['edit2','details','delete'],
+                },
+        	],
         	
         }
     },
     methods: {//方法
     	
-    	ajax(){
-    		
-    		this.$axios.post('接口路径', {
-    			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
-    	},
-    	
     },
     computed:{//计算属性
-        	
+        
     },
     created(){//实例被创建完毕之后执行
     	
@@ -56,7 +79,7 @@ export default {
     	
 	},
     watch:{//监测数据变化
-		
+    	
 	}
 }
 </script>

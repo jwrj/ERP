@@ -18,10 +18,9 @@
 						</div>
 					</div>
 					
-					
 					<div style="padding:15px;">
 						
-						<!--客户信息-->
+						<!--其他页面数据-->
 						<div v-for="client in item.usDataPageList" style="margin-bottom:15px;">
 							
 							<Card>
@@ -30,10 +29,18 @@
 									
 									<h2>{{client.name}}</h2>
 									
-									<div>
+									<div v-if="client.pid_tree_title == 2">
 										<span style="font-size:12px;margin-right:10px;">更换客户</span>
 										<Select v-model="clientId" filterable style="width:200px">
 									        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+									    </Select>
+										<Button type="primary" @click="clientSave">确认更换</Button>
+									</div>
+									
+									<div v-if="client.pid_tree_title == 27">
+										<span style="font-size:12px;margin-right:10px;">更换地址</span>
+										<Select v-model="addressId" filterable style="width:200px">
+									        <Option v-for="item in addressList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 									    </Select>
 										<Button type="primary" @click="clientSave">确认更换</Button>
 									</div>
@@ -72,7 +79,7 @@
 							</Card>
 							
 						</div>
-						<!--客户信息-->
+						<!--其他页面数据-->
 						
 						<!--物品列表-->
 						<Card v-if="item.itemsList && item.itemsList.length > 0" style="margin-bottom:15px;">
@@ -81,7 +88,11 @@
 							
 							<div style="padding: 15px;">
 								
-								<Table border @on-selection-change="tableChange" :columns="goodsColumns" :data="item.itemsList"></Table>
+								<!--默认显示-->
+								<Table v-if="$route.name != 'delivergoodsList'" border @on-selection-change="tableChange" :columns="goodsColumns" :data="item.itemsList"></Table>
+								
+								<!--发货单显示-->
+								<Table v-if="$route.name == 'delivergoodsList'" border @on-selection-change="tableChange" :columns="goodsColumns2" :data="item.itemsList"></Table>
 								
 								<div style="margin-top:10px;">
 									
@@ -108,7 +119,7 @@
 														</Select>
 													</FormItem>
 													
-													<FormItem label="需求数量" prop="needNumber">
+													<FormItem :label="$route.name != 'delivergoodsList' ? '需求数量' : '发货数量'" prop="needNumber">
 														<Input v-model="formModel.needNumber" placeholder="请输入数量"></Input>
 													</FormItem>
 													
@@ -129,6 +140,7 @@
 						</Card>
 						<!--物品列表-->
 						
+						<!--附加表单数据-->
 						<Card>
 							
 							<div slot="title" style="display:flex;justify-content:space-between;align-items: center;">
@@ -190,11 +202,11 @@
 							</div>
 						
 						</Card>
+						<!--附加表单数据-->
 						
 					</div>
 					
 				</Card>
-				
 				
 			</div>
 			
@@ -257,7 +269,11 @@
 				
 				clientList: [],//客户列表
 				
+				addressList: [],//地址列表
+				
 				clientId: '',//当前客户id
+				
+				addressId: '',//当前地址id
 				
 				tableSelectData: [],//表格当前勾选中的数据
 				
@@ -301,6 +317,7 @@
 				
 				formDatas:[],//表单数据
 				
+				//================默认数据================
 				goodsColumns: [//物品表头数据
 					{
                         type: 'selection',
@@ -329,6 +346,84 @@
 						width: 160,
 						align: 'center',
 						title: '需求数量',
+						render: (h, params) => {
+							let current = this.tableSelectData.filter((item) => {return item.id == params.row.id;});
+    						let currentRow = current[0];
+    						
+							let current2 = this.modificationList.filter((item2) => {return item2.id == params.row.id;});
+    						let currentRow2 = current2[0];
+    						
+    						let _this = this;
+    						if(currentRow){
+		    					if(currentRow.editable){//显示文本输入框
+		    						return h('Input', {
+		                                props: {
+		                                    type: 'text',
+		                                    clearable: true,
+		                                    value: currentRow2.number,
+		                                    placeholder:'请输入' + params.column.title
+		                                },
+		                                on: {
+		                                    'on-change' (event) {
+		                                    	currentRow2.number = event.target.value;
+		                                    }
+		                                }
+		                            });
+		    					}
+    						}else{
+    							return h('span',params.row.number);
+    						}
+						}
+					},
+					{
+						title: '其它信息',
+						render: (h, params) => {
+							let str = '';
+							
+							params.row.item_info.formData.forEach(item => {
+								
+								item.formFields.forEach(item2 => {
+									
+									str += item2.label+'：'+item2.value+'，';
+									
+								});
+								
+							});
+							
+							return h('div',str)
+						},
+					},
+				],
+				
+				//================发货单页面数据================
+				goodsColumns2: [//物品表头数据
+					{
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+					{
+						width: 100,
+						align: 'center',
+						title: 'ID',
+						key: 'id',
+					},
+					{
+						width: 100,
+						align: 'center',
+						title: '物品ID',
+						key: 'item_id',
+					},
+					{
+						title: '物品名称',
+						render: (h, params) => {
+							return h('span',params.row.item_info.name)
+						},
+					},
+					{
+						width: 160,
+						align: 'center',
+						title: '发货数量',
 						render: (h, params) => {
 							let current = this.tableSelectData.filter((item) => {return item.id == params.row.id;});
     						let currentRow = current[0];
@@ -416,13 +511,21 @@
 					delete: "false"
 				}];
 				
+				let DBname = '';
+	       			
+       			if(this.$route.name != 'delivergoodsList'){
+       				DBname = 'ExtendOrder';
+       			}else if(this.$route.name == 'delivergoodsList'){
+       				DBname = 'ExtendWarehousing';
+       			}
+				
 				this.$refs.formInstance[0].validate((valid) => {
 					
                     if (valid) {
                     	
                     	this.$axios.post('system/data_saveAll', {
 							data: JSON.stringify(data),
-							DBname: "ExtendOrder",
+							DBname: DBname,
 						})
 						.then(response => {
 							
@@ -441,7 +544,6 @@
 				
 			},
 			getClientList(){//获取客户列表
-				console.log('获取客户列表');
 				this.$axios.post('system/page_list', {
     				where: '{"pid_tree_title":["=",2]}',
     				page: 1,
@@ -466,12 +568,47 @@
 					console.log(error);
 				});
 			},
+			getAddressList(){//获取地址列表
+				this.$axios.post('system/page_list', {
+    				where: '{"pid_tree_title":["=",27]}',
+    				page: 1,
+    				pageSize: 20000,
+    				order: '{"id":"asc"}',
+				})
+				.then(response => {
+					
+					let arr = [];
+					
+					response.data.dataList.data.forEach(item => {
+						arr.push({
+							label: item.name,
+							value: item.id,
+						});
+					});
+					
+					this.addressList = arr;
+					
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			},
 			clientSave(){//保存修改的客户
+				
+				let arr = [];
+				
+				if(this.clientId){
+					arr.push([2,this.clientId]);
+				}
+				
+				if(this.addressId){
+					arr.push([27,this.addressId]);
+				}
 				
 				let data = [
 					{
 						id: this.indentId,
-						use_dataPage_ids: JSON.stringify([[2,this.clientId]]),
+						use_dataPage_ids: JSON.stringify(arr),
 						delete:"false",
 					}
 				];
@@ -521,13 +658,31 @@
 					
 					this.dataList = arr;
 					
+					console.log(response.data);
+					
 					if(arr[0].itemsList.length > 0){
 						this.getGoodsList();//获取物品列表
 					}
 					
 					if(response.data.use_dataPage_list && response.data.use_dataPage_list.length > 0){
+						
 						this.getClientList();//获取客户列表
-						this.clientId = response.data.use_dataPage_list[0].id;
+						
+						this.getAddressList();//获取地址列表
+						
+						response.data.use_dataPage_list.forEach(item => {
+							
+							switch(item.pid_tree_title){
+							   	case 2:
+									this.clientId = item.id;
+							    	break;
+							   	case 27:
+									this.addressId = item.id;
+							    	break;
+							}
+							
+						})
+						
 					}
 					
 					if(response.data.dataFormTable_ids){
@@ -878,9 +1033,17 @@
 	       		
 	       		if(arr.length > 0){
 	       			
+	       			let DBname = '';
+	       			
+	       			if(this.$route.name != 'delivergoodsList'){
+	       				DBname = 'ExtendOrder';
+	       			}else if(this.$route.name == 'delivergoodsList'){
+	       				DBname = 'ExtendWarehousing';
+	       			}
+	       			
 	       			this.$axios.post('system/data_saveAll', {
     					data: JSON.stringify(arr),
-    					DBname: "ExtendOrder",
+    					DBname: DBname,
 					})
 					.then(response => {
 						this.tableSelectData = [];
@@ -918,9 +1081,17 @@
 	       		
 	       		if(arr.length > 0){
 	       			
+	       			let DBname = '';
+	       			
+	       			if(this.$route.name != 'delivergoodsList'){
+	       				DBname = 'ExtendOrder';
+	       			}else if(this.$route.name == 'delivergoodsList'){
+	       				DBname = 'ExtendWarehousing';
+	       			}
+	       			
 	       			this.$axios.post('system/data_saveAll', {
     					data: JSON.stringify(arr),
-    					DBname: "ExtendOrder",
+    					DBname: DBname,
 					})
 					.then(response => {
 						this.tableSelectData = [];
@@ -936,6 +1107,9 @@
 	       		}
 	       		
 	       	},
+			
+		},
+		computed: {//计算属性
 			
 		},
 		mounted(){//模板被渲染完毕之后执行

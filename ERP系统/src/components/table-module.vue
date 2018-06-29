@@ -1136,7 +1136,7 @@ export default {
     	},
     	
     	//==================================================================
-    	ordinaryDel(id){//删除方法
+    	ordinaryDel(id){//删除方法(单个操作)
     		
     		this.loads.delLoading = true;
     		
@@ -1162,7 +1162,7 @@ export default {
 			
     	},
     	
-    	allPowerfulDel(id){//万能删除
+    	allPowerfulDel(id){//万能删除(批量操作)
     		this.loads.delLoading = true;
 				
 			let data = [

@@ -333,7 +333,7 @@ export default {
 		        	}
                 	
                 } else {
-                    this.$Message.error('请输入名称！');
+                    this.$Message.error('请完善信息！');
                 }
                 
             })

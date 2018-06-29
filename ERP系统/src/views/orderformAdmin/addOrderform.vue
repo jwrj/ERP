@@ -2,49 +2,53 @@
 	<div>
 		
 		<Card>
+			
 			<div style="padding:24px 0 0;">
 				
-    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="80" inline>
-    				
+				<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="80">
+					
 			        <FormItem label="订单名称" prop="name">
-			            <Input v-model="formItem.name" style="width: 160px;" placeholder="请输入订单名称"></Input>
+			            <Input v-model="formItem.name" clearable style="width: 160px;" placeholder="请输入订单名称"></Input>
 			        </FormItem>
 			        
 			        <FormItem label="选择客户" prop="clientModel">
-			        	
 			            <Select v-model="formItem.clientModel" filterable placeholder="无数据" style="width:150px" @on-change="clientSele">
 					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					    </Select>
-					    
 					    <Button type="dashed" icon="plus-round" @click="addClient">新增客户</Button>
-					    
 					    <Button type="primary" icon="edit" @click="editClient">编辑客户</Button>
-					    
 			        </FormItem>
 			        
-				</Form>
-				
-				
+			        <FormItem label="送货信息">
+			            <Checkbox v-model="addressIo" @on-change="checkbox"></Checkbox>
+			        </FormItem>
+			        
+		        </Form>
+			        
 			</div>
+			
 		</Card>
 		
-    	<Card v-if="clientList.length > 0" style="margin-top:15px;">
+    	<Card style="margin-top:15px;" v-if="clientList.length > 0">
     		
     		<h1 slot="title">订单客户</h1>
-    		
+    			
     		<div style="padding:15px;">
 	    		<form-view ref="viewInstance"></form-view>
     		</div>
     		
     	</Card>
     	
-    	<Card style="margin-top:15px;">
+    	<Card style="margin-top:15px;" v-if="addressIo">
     		
-    		<div slot="title">
-    			<label style="margin-right:10px;font-size: 12px;">选择送货地址</label>
-	    		<Select v-model="formItem.address" filterable placeholder="无数据" style="width:150px" @on-change="addressSele">
-			        <Option v-for="item in addressList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-			    </Select>
+    		<div slot="title" style="display:flex;align-items: center;">
+    			<h1>订单送货信息</h1>
+    			<div style="margin-left: auto;">
+	    			<label style="margin-right:10px;font-size: 12px;">选择送货地址</label>
+		    		<Select v-model="formItem.address" filterable placeholder="无数据" style="width:150px" @on-change="addressSele">
+				        <Option v-for="item in addressList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+				    </Select>
+    			</div>
     		</div>
     		
     		<div style="padding:15px;" v-if="addressList.length > 0">
@@ -107,7 +111,7 @@
     			ref="newFormInstance"
     			:pid-tree-class="4"
     			:pageId="22"
-				titleName="订单信息"
+				titleName="订单附加信息"
 				buttonName="新增订单"
 				submitUrl="orders/order_add"
     		>
@@ -343,6 +347,8 @@ export default {
 			
 			addressList: [],//地址列表
 			
+			addressIo: true,
+			
 			seleOnOff1: false,
 			
 			seleOnOff2: false,
@@ -408,16 +414,18 @@ export default {
 		},
 		clientSele(id){//选择客户
 			
+			if(this.clientList.length <= 0)return false
+			
 			this.$refs.newFormInstance.useDataPageIdArr = [];
 			
 			this.$refs.viewInstance.getTitleList(id);
 			
 			if(this.seleOnOff1){
-				
-				setTimeout(() => {
-					this.$refs.viewInstance2.getTitleList(this.formItem.address);
-				},100);
-				
+				if(this.addressList.length > 0){
+					setTimeout(() => {
+						this.$refs.viewInstance2.getTitleList(this.formItem.address);
+					},30);
+				}
 			}else{
 				
 				this.seleOnOff1 = true;
@@ -463,12 +471,14 @@ export default {
 		},
 		addressSele(id){//选择地址
 			
+			if(this.addressList.length <= 0)return false
+			
 			this.$refs.newFormInstance.useDataPageIdArr = [];
 			
 			if(this.seleOnOff2){
-				
-				this.$refs.viewInstance.getTitleList(this.formItem.clientModel);
-				
+				if(this.clientList.length > 0){
+					this.$refs.viewInstance.getTitleList(this.formItem.clientModel);
+				}
 			}else{
 				
 				this.seleOnOff2 = true;
@@ -478,6 +488,23 @@ export default {
 			setTimeout(() => {
 				this.$refs.viewInstance2.getTitleList(id);
 			},30);
+			
+		},
+		checkbox(tf){
+			
+			this.addressList = [];
+			
+			this.formItem.address = '';
+			
+			this.$refs.newFormInstance.useDataPageIdArr = [];
+			
+			if(tf){
+				this.getAddress();//获取地址列表
+			}
+			
+			if(!tf && this.clientList.length > 0){
+				this.$refs.viewInstance.getTitleList(this.formItem.clientModel);
+			}
 			
 		},
 		showConfiguration(str){//点击查看配置
@@ -520,9 +547,13 @@ export default {
     created(){
 	},
 	mounted(){
+		
 		this.getClient();//获取客户列表
 		
-		this.getAddress();//获取地址列表
+		if(this.addressIo){
+			this.getAddress();//获取地址列表
+		}
+		
 	},
 }
 </script>

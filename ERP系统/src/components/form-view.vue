@@ -16,7 +16,7 @@
 				
 				<div style="padding:0 15px 15px 15px;">
 				
-					<!--客户信息-->
+					<!--其他页面数据-->
 					<div v-for="client in item.usDataPageList" style="margin-top:15px;">
 						
 						<Card>
@@ -59,19 +59,30 @@
 						</Card>
 						
 					</div>
-					<!--客户信息-->
+					<!--其他页面数据-->
 					
 					<!--物品列表-->
 					<Card v-if="item.itemsList && item.itemsList.length > 0" style="margin-top:15px;">
 						
 						<h2 slot="title">物品列表</h2>
 						
-						<div v-if="$route.name != 'billEdit-1'" style="padding: 15px;">
+						<!--默认显示-->
+						<div v-if="$route.name != 'billEdit-1' && $route.name != 'delivergoodsList'" style="padding: 15px;">
 							
 							<Table border :columns="goodsColumns" :data="item.itemsList"></Table>
 							
 						</div>
+						<!--默认显示-->
 						
+						<!--发货单显示-->
+						<div v-if="$route.name == 'delivergoodsList'" style="padding: 15px;">
+							
+							<Table border :columns="goodsColumns3" :data="item.itemsList"></Table>
+							
+						</div>
+						<!--发货单显示-->
+						
+						<!--财务显示-->
 						<div v-if="$route.name == 'billEdit-1'" style="padding: 15px;">
 							
 							<Table border :columns="goodsColumns2" :data="item.itemsList" @on-selection-change="tableChange"></Table>
@@ -87,10 +98,12 @@
 							</div>
 							
 						</div>
+						<!--财务显示-->
 						
 					</Card>
 					<!--物品列表-->
 					
+					<!--附加表单数据-->
 					<div v-for="main in item.title" style="margin-top:15px;">
 						
 						<Card>
@@ -119,6 +132,7 @@
 						</Card>
 							
 					</div>
+					<!--附加表单数据-->
 				
 				</div>
 				
@@ -168,6 +182,7 @@
 				
 				sumPriceIo: false,//显示
 				
+				//==================默认数据======================
 				goodsColumns: [//物品表头数据
 					{
 						width: 100,
@@ -214,7 +229,54 @@
 					},
 				],
 				
-				//====================================================
+				//==================发货单数据======================
+				goodsColumns3: [//物品表头数据
+					{
+						width: 100,
+						align: 'center',
+						title: 'ID',
+						key: 'id',
+					},
+					{
+						width: 100,
+						align: 'center',
+						title: '物品ID',
+						key: 'item_id',
+					},
+					{
+						title: '物品名称',
+						render: (h, params) => {
+							return h('span',params.row.item_info.name)
+						},
+					},
+					{
+						width: 160,
+						align: 'center',
+						title: '发货数量',
+						key: 'number',
+					},
+					{
+						title: '其它信息',
+						render: (h, params) => {
+							
+							let str = '';
+							
+							params.row.item_info.formData.forEach(item => {
+								
+								item.formFields.forEach(item2 => {
+									
+									str += item2.label+'：'+item2.value+'，';
+									
+								});
+								
+							});
+							
+							return h('div',str)
+						},
+					},
+				],
+				
+				//====================财务数据================================
 				
 				tableSelectData: [],//表格当前勾选中的数据
 				
