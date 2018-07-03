@@ -131,7 +131,15 @@ export default {
         			title: '客户库存',
                     render: (h, params) => {
                     	
-                    	return h('span',params.row.warehousingFinal);
+                    	if(params.row.warehousingFinal){
+                    		
+                    		return h('span',params.row.warehousingFinal);
+                    		
+                    	}else{
+                    		
+                    		return h('span',0);
+                    		
+                    	}
 						
                     }
         		},

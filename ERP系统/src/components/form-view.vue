@@ -67,7 +67,7 @@
 						<h2 slot="title">物品列表</h2>
 						
 						<!--默认显示-->
-						<div v-if="$route.name != 'billEdit-1' && $route.name != 'delivergoodsList'" style="padding: 15px;">
+						<div v-if="$route.name != 'billEdit-1' && $route.name != 'delivergoodsList' && $route.name != 'pickingList'" style="padding: 15px;">
 							
 							<Table border :columns="goodsColumns" :data="item.itemsList"></Table>
 							
@@ -78,6 +78,14 @@
 						<div v-if="$route.name == 'delivergoodsList'" style="padding: 15px;">
 							
 							<Table border :columns="goodsColumns3" :data="item.itemsList"></Table>
+							
+						</div>
+						<!--发货单显示-->
+						
+						<!--领料单显示-->
+						<div v-if="$route.name == 'pickingList'" style="padding: 15px;">
+							
+							<Table border :columns="goodsColumns4" :data="item.itemsList"></Table>
 							
 						</div>
 						<!--发货单显示-->
@@ -276,6 +284,53 @@
 					},
 				],
 				
+				//==================发货单数据======================
+				goodsColumns4: [//物品表头数据
+					{
+						width: 100,
+						align: 'center',
+						title: 'ID',
+						key: 'id',
+					},
+					{
+						width: 100,
+						align: 'center',
+						title: '物品ID',
+						key: 'item_id',
+					},
+					{
+						title: '物品名称',
+						render: (h, params) => {
+							return h('span',params.row.item_info.name)
+						},
+					},
+					{
+						width: 160,
+						align: 'center',
+						title: '领料数量',
+						key: 'number',
+					},
+					{
+						title: '其它信息',
+						render: (h, params) => {
+							
+							let str = '';
+							
+							params.row.item_info.formData.forEach(item => {
+								
+								item.formFields.forEach(item2 => {
+									
+									str += item2.label+'：'+item2.value+'，';
+									
+								});
+								
+							});
+							
+							return h('div',str)
+						},
+					},
+				],
+				
 				//====================财务数据================================
 				
 				tableSelectData: [],//表格当前勾选中的数据
@@ -408,6 +463,8 @@
 					id:id,
 				})
 				.then(response => {
+					
+					this.$emit('elseFormId',response.data.dataFormTable_id2);//侦测用到的其他表单ID（如：回款记录下用到）
 					
 					let arr = [];
 					

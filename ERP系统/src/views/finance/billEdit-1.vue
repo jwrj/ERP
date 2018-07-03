@@ -14,6 +14,7 @@
 					:pageId="22"
 					stateListId="16"
 					seleSeekField="pid_status"
+					:ordClientSelect="true"
 					
 					tableDataUrl="orders/order_list"
 					deleUrl="orders/order_delete"
@@ -27,6 +28,25 @@
 			
 		</Card>
 		
+		<!--回款记录弹窗-->
+		<Modal v-model="modalShow" width="80%">
+	    	
+	    	<p slot="header">回款详情</p>
+	        <div>
+	        	<returned-money
+        			v-if="modalShow"
+        			:rowId="rowId"
+        			rowUrl="orders/order_show"
+        		>
+	        	</returned-money>
+	        </div>
+	        <div slot="footer">
+	            <Button @click="modalShow = false">关闭</Button>
+	        </div>
+	    	
+	    </Modal>
+	    <!--回款记录弹窗-->
+		
 	</div>
 	
 </template>
@@ -35,7 +55,7 @@
 	
 import tableModule from '@/components/table-module.vue';
 
-import returnedMoney from '@/views/billEdit/returned-money.vue';
+import returnedMoney from '@/views/finance/returned-money.vue';
 	
 export default {
 	components:{//模板
@@ -47,21 +67,12 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	modalShow: false,
+        	
+        	rowId: null,
+        	
         	columns:[
-        		{
-        			title: '回款记录',
-        			width:100,
-        			align: 'conter',
-                   	type: 'expand',
-                   	render: (h, params) => {
-                        return h(returnedMoney, {
-                            props: {
-                            	rowId: params.row.id,
-                            	rowUrl: 'orders/order_show',
-                            },
-                        })
-                    }
-                },
         		{
         			align:'center',
         			width:70,
@@ -81,6 +92,31 @@ export default {
         		{
         			title: '日期',
                     key: 'create_time',
+        		},
+        		{
+        			title: '回款记录',
+                    width:90,
+        			align: 'center',
+                   	render: (h, params) => {
+                   		
+                   		let _this = this;
+                   		
+                   		return h('Button',{
+                   			props: {
+                   				type: 'primary',
+                   				size: 'small',
+                            },
+                   			on: {
+                   				click(){
+                   					
+                   					_this.rowId = params.row.id;
+                   					
+                   					_this.modalShow = true;
+                   					
+                   				}
+                   			},
+                   		},'查看');
+                   	}
         		},
         		{
                 	title: '操作',

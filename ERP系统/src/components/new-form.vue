@@ -198,9 +198,8 @@ export default {
         },
         submit(){//表单提交
         	
-        	console.log(this.useDataPageIdArr);
-        	
         	let num1 = 0;
+        	
 			let num2 = 0;
 			
         	this.$parent.$refs['formItem'].validate((valid) => {
@@ -224,6 +223,7 @@ export default {
 		        			name:this.$parent.formItem.name,
 		        			pid_tree_title:this.pageId,
 		        			use_dataPage_ids: this.useDataPageIdArr.length > 0 ? JSON.stringify(this.useDataPageIdArr) : null,
+		        			for_user_id: this.$parent.purchaseGoods ? this.$parent.formItem.clientModel : null,
 		        		}
 		        		
 		        		let infoString = JSON.stringify(info);

@@ -5,60 +5,106 @@
 		<form-view
 			ref="formViewInstance"
 			v-show="false"
-			:form-view-id = "rowId"
+			:form-view-id="rowId"
+			@elseFormId="getFormId"
 			:showUrl="rowUrl">
 		</form-view>
 		
-		<Card>
+		<div>
 				
-			<div slot="title" style="display:flex;justify-content:space-between;align-items: center;">
+			<Card>
 				
-				<h2>回款记录表</h2>
-				
-				<Tooltip content="添加回款记录" placement="left">
-					<Button type="dashed" size="small" shape="circle" icon="plus-round" @click="modal = true"></Button>
-		        </Tooltip>
+				<div slot="title" style="display:flex;align-items: center;">
 					
-			</div>
-			
-			<div style="padding:16px;">
-				
-				
-				
-				<Table border :columns="recordColu" :data="recordData"></Table>
-				
-				<div style="padding:10px;margin-top:-1px;border:1px solid #dddee1;">
-					<h2 style="padding:2px 0;">
-						订单总货款：<span style="color:#ed3f14;">{{sumPrice.toFixed(2)}}</span>
-						元
-					</h2>
-					<h2 style="padding:2px 0;">
-						实收总货款：<span style="color:#ed3f14;">{{receivedMoney.toFixed(2)}}</span>
-						元
-					</h2>
-					<h2 style="padding:2px 0;">
-						欠款总金额：<span style="color:#ed3f14;">{{floatAdd(sumPrice,receivedMoney).toFixed(2)}}</span>
-						元
-					</h2>
+					<h2 slot="title">回款记录列表</h2>
+					
+					<span style="font-size: 12px;margin-right:10px;margin-left:auto;">添加记录</span>
+					
+					<Button type="dashed" size="small" shape="circle" icon="plus-round" @click="modal = true"></Button>
+						
 				</div>
 				
-			</div>
+				<div style="padding:16px;">
+					
+					<Table border :columns="recordColu" :data="recordData"></Table>
+					
+				</div>
 			
-		</Card>
+			</Card>
+			
+			<Row :gutter="16" type="flex" style="margin-top:16px;">
+				
+		        <Col span="7">
+		        	
+		        	<Card style="height: 100%;">
+					
+						<h2 slot="title">回款统计</h2>
+						
+						<div style="padding:16px;">
+							
+							<h2 style="padding:2px 0;">
+								订单总货款：<span style="color:#ed3f14;">{{sumPrice.toFixed(2)}}</span>
+								元
+							</h2>
+							
+							<h2 style="padding:2px 0;">
+								实收总货款：<span style="color:#ed3f14;">{{receivedMoney.toFixed(2)}}</span>
+								元
+							</h2>
+							
+							<h2 style="padding:2px 0;">
+								欠款总金额：<span style="color:#ed3f14;">{{floatAdd(sumPrice,receivedMoney).toFixed(2)}}</span>
+								元
+							</h2>
+							
+						</div>
+						
+					</Card>
+		        	
+		        </Col>
+		        
+		        <Col span="17">
+		        	
+		        	<Card style="height: 100%;">
+					
+						<h2 slot="title">自定义内容</h2>
+						
+						<form-mod v-if="formID" :readOnly="true" :form-data="formDataList"></form-mod>
+						
+					</Card>
+		        	
+		        </Col>
+				
+			</Row>
+			
+			<Card style="margin-top:16px;">
+				
+				<h2 slot="title">自定义（编辑）</h2>
+				
+				<form-mod ref="modInstance" @increment="formEvent" :pid="Number(formID)" :form-data="formDataList"></form-mod>
+				
+				<div style="text-align: center;padding:16px 0;">
+					<Button type="primary" @click="submitForm">{{formID ? '修改' : '提交'}}</Button>
+				</div>
+				
+			</Card>
+				
+		</div>
 		
 		<Modal
 	        v-model="modal"
+	        width="400"
 	        title="添加回款纪录"
 	    >
 	        <div>
 	        	<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="100">
 	        		
 			        <FormItem label="实收货款(元)" prop="money">
-			            <Input type="text" v-model="formInline.money" placeholder="输入金额"></Input>
+			            <Input type="text" style="width: 160px" v-model="formInline.money" placeholder="输入金额"></Input>
 			        </FormItem>
 			        
 			        <FormItem label="日期" prop="date">
-			            <DatePicker type="date" placeholder="选择日期" @on-change="seleDate" :value="formInline.date" style="width: 200px"></DatePicker>
+			            <DatePicker type="date" placeholder="选择日期" @on-change="seleDate" :value="formInline.date" style="width: 160px"></DatePicker>
 			        </FormItem>
 			        
 			    </Form>
@@ -189,9 +235,12 @@ const delButton = (_this,h,params) => {//删除按钮
 
 import formView from '@/components/form-view.vue';
 
+import formMod from '@/components/form.vue';
+
 export default {
 	components:{//模板
 		formView,
+		formMod,
 	},
 	props:{
 		
@@ -252,6 +301,12 @@ export default {
                     { required: true, message: '选择日期', trigger: 'change' }
                 ],
            },
+           
+           formDatas:[],//提交的表单数据
+           
+           formDataList:[],//表单数据列表
+           
+           formID: '',//表单ID
            
         }
     },
@@ -368,6 +423,33 @@ export default {
 			});
 			
     	},
+    	getFormShow(id){//读取表单详情
+    		
+    		this.$axios.post('system/showFormFields', {
+    			id: id,
+			})
+			.then(response => {
+				
+				this.formID = response.data.info.id;
+				
+				this.formDataList = response.data.fields;
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+			
+    	},
+    	getFormId(id){//侦听获取其他表单ID
+    		
+    		if(id){
+    			this.getFormShow(id);//读取表单详情
+    		}
+    		
+    	},
+    	formEvent(){//数据改变时
+        	this.formDatas = this.$refs.modInstance.formDynamic.data;
+        },
     	addRecord(){//添加纪录
     		this.$refs['formInline'].validate((valid) => {
 				
@@ -396,7 +478,29 @@ export default {
                 }
                 
             });
-    	}
+    	},
+    	submitForm(){//提交表单
+    		
+    		this.$axios.post('system/addFormToDataPage', {
+    			update_form_id: this.formID,
+    			fields: JSON.stringify(this.formDatas),
+    			for_page_data_id: this.rowId,
+    			title: '回款备注表单',
+    			pid: 0,
+			})
+			.then(response => {
+				if(response.code == 1){
+					if(!this.formID){
+						this.getFormShow(response.data.updateData.dataFormTable_id2);//获取其他表单ID
+					}
+					this.$Message.success('提交成功');
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+			
+    	},
     	
     },
     computed:{//计算属性
@@ -410,6 +514,7 @@ export default {
     	this.returnedMoneyList(this.rowId);//回款列表
     	
     	clearInterval(time);
+    	
 		let time = setInterval(() => {
 			if(this.$refs.formViewInstance){
 				if(this.$refs.formViewInstance.sumPrice.length > 0){

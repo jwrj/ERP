@@ -176,7 +176,7 @@ export const appRouter = [
             {
                 path:'pickingList',
                 name:'pickingList',
-                title:'领料单',
+                title:'领料单列表',
                 component: resolve => { require(['@/views/productionAdmin/pickingList.vue'], resolve); }
             },
         ]
@@ -232,10 +232,10 @@ export const appRouter = [
         ]
     },
     {
-    	path:'/billEdit',
+    	path:'/finance',
         icon:'ios-paper-outline',
-        name:'billEdit',
-        title:'账单编辑',
+        name:'finance',
+        title:'财务',
         component: Frame,
         children: [
             {
@@ -243,7 +243,7 @@ export const appRouter = [
                 icon:'ios-paper-outline',
                 name:'billEdit-1',
                 title:'账单编辑',
-                component: resolve => { require(['@/views/billEdit/billEdit-1.vue'], resolve); }
+                component: resolve => { require(['@/views/finance/billEdit-1.vue'], resolve); }
             },
         ]
     },

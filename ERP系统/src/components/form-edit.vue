@@ -89,10 +89,13 @@
 							<div style="padding: 15px;">
 								
 								<!--默认显示-->
-								<Table v-if="$route.name != 'delivergoodsList'" border @on-selection-change="tableChange" :columns="goodsColumns" :data="item.itemsList"></Table>
+								<Table v-if="$route.name != 'delivergoodsList' && $route.name != 'pickingList'" border @on-selection-change="tableChange" :columns="goodsColumns" :data="item.itemsList"></Table>
 								
 								<!--发货单显示-->
 								<Table v-if="$route.name == 'delivergoodsList'" border @on-selection-change="tableChange" :columns="goodsColumns2" :data="item.itemsList"></Table>
+								
+								<!--领料单显示-->
+								<Table v-if="$route.name == 'pickingList'" border @on-selection-change="tableChange" :columns="goodsColumns3" :data="item.itemsList"></Table>
 								
 								<div style="margin-top:10px;">
 									
@@ -119,7 +122,7 @@
 														</Select>
 													</FormItem>
 													
-													<FormItem :label="$route.name != 'delivergoodsList' ? '需求数量' : '发货数量'" prop="needNumber">
+													<FormItem :label="label" prop="needNumber">
 														<Input v-model="formModel.needNumber" placeholder="请输入数量"></Input>
 													</FormItem>
 													
@@ -473,6 +476,84 @@
 					},
 				],
 				
+				//================领料单页面数据================
+				goodsColumns3: [//物品表头数据
+					{
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+					{
+						width: 100,
+						align: 'center',
+						title: 'ID',
+						key: 'id',
+					},
+					{
+						width: 100,
+						align: 'center',
+						title: '物品ID',
+						key: 'item_id',
+					},
+					{
+						title: '物品名称',
+						render: (h, params) => {
+							return h('span',params.row.item_info.name)
+						},
+					},
+					{
+						width: 160,
+						align: 'center',
+						title: '领料数量',
+						render: (h, params) => {
+							let current = this.tableSelectData.filter((item) => {return item.id == params.row.id;});
+    						let currentRow = current[0];
+    						
+							let current2 = this.modificationList.filter((item2) => {return item2.id == params.row.id;});
+    						let currentRow2 = current2[0];
+    						
+    						let _this = this;
+    						if(currentRow){
+		    					if(currentRow.editable){//显示文本输入框
+		    						return h('Input', {
+		                                props: {
+		                                    type: 'text',
+		                                    clearable: true,
+		                                    value: currentRow2.number,
+		                                    placeholder:'请输入' + params.column.title
+		                                },
+		                                on: {
+		                                    'on-change' (event) {
+		                                    	currentRow2.number = event.target.value;
+		                                    }
+		                                }
+		                            });
+		    					}
+    						}else{
+    							return h('span',params.row.number);
+    						}
+						}
+					},
+					{
+						title: '物品参数',
+						render: (h, params) => {
+							let str = '';
+							
+							params.row.item_info.formData.forEach(item => {
+								
+								item.formFields.forEach(item2 => {
+									
+									str += item2.label+'：'+item2.value+'，';
+									
+								});
+								
+							});
+							
+							return h('div',str)
+						},
+					},
+				],
+				
 			}
 		},
 		methods: {
@@ -513,9 +594,11 @@
 				
 				let DBname = '';
 	       			
-       			if(this.$route.name != 'delivergoodsList'){
+       			if(this.$route.name != 'delivergoodsList' && this.$route.name != 'pickingList'){
        				DBname = 'ExtendOrder';
        			}else if(this.$route.name == 'delivergoodsList'){
+       				DBname = 'ExtendWarehousing';
+       			}else if(this.$route.name == 'pickingList'){
        				DBname = 'ExtendWarehousing';
        			}
 				
@@ -609,6 +692,7 @@
 					{
 						id: this.indentId,
 						use_dataPage_ids: JSON.stringify(arr),
+						for_user_id: this.clientId,
 						delete:"false",
 					}
 				];
@@ -1035,9 +1119,11 @@
 	       			
 	       			let DBname = '';
 	       			
-	       			if(this.$route.name != 'delivergoodsList'){
+	       			if(this.$route.name != 'delivergoodsList' && this.$route.name != 'pickingList'){
 	       				DBname = 'ExtendOrder';
 	       			}else if(this.$route.name == 'delivergoodsList'){
+	       				DBname = 'ExtendWarehousing';
+	       			}else if(this.$route.name == 'pickingList'){
 	       				DBname = 'ExtendWarehousing';
 	       			}
 	       			
@@ -1083,9 +1169,11 @@
 	       			
 	       			let DBname = '';
 	       			
-	       			if(this.$route.name != 'delivergoodsList'){
+	       			if(this.$route.name != 'delivergoodsList' && this.$route.name != 'pickingList'){
 	       				DBname = 'ExtendOrder';
 	       			}else if(this.$route.name == 'delivergoodsList'){
+	       				DBname = 'ExtendWarehousing';
+	       			}else if(this.$route.name == 'pickingList'){
 	       				DBname = 'ExtendWarehousing';
 	       			}
 	       			
@@ -1110,6 +1198,22 @@
 			
 		},
 		computed: {//计算属性
+			
+			label(){
+				
+				let txt = '';
+				
+				if(this.$route.name != 'delivergoodsList' && this.$route.name != 'pickingList'){
+       				txt = '需求数量';
+       			}else if(this.$route.name == 'delivergoodsList'){
+       				txt = '发货数量';
+       			}else if(this.$route.name == 'pickingList'){
+       				txt = '领料数量';
+       			}
+       			
+       			return txt;
+				
+			},
 			
 		},
 		mounted(){//模板被渲染完毕之后执行

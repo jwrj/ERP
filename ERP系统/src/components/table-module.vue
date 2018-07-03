@@ -13,7 +13,7 @@
 		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 			<!--客户下拉列表-->
-		    <Select v-if="clientSelect" :value="screenVal.client" @on-change="clientChange" placeholder="选择客户" style="width:200px;margin-right:10px;">
+		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" placeholder="选择客户" style="width:200px;margin-right:10px;">
 		        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 		    <!--搜索框-->
@@ -468,6 +468,11 @@ export default {
 	 	},
 	 	
 	 	clientSelect:{//客户下拉列表
+	 		type: Boolean,
+	 		default: false,
+	 	},
+	 	
+	 	ordClientSelect:{//订单客户下拉列表
 	 		type: Boolean,
 	 		default: false,
 	 	},
@@ -1033,10 +1038,18 @@ export default {
     			where.pid_tree_title = ["=",this.pageId];
     		}
     		
+    		if(this.ordClientSelect && stateInfo.client){
+    			where.for_user_id = ["=",stateInfo.client];
+    		}
+    		
     		if(this.whereId.length >= 2){
+    			
     			where.id = this.whereId;
+    			
     		}else if(this.whereId.length == 1){
+    			
     			where.id = ["=",null];
+    			
     		}
     		
     		if(this.pidTreeClassId){
@@ -1218,7 +1231,7 @@ export default {
     	
     	this.getDataList(this.stateInfo);//获取数据列表
     	
-    	if(this.clientSelect){
+    	if(this.clientSelect || this.ordClientSelect){
     		this.getClient();//获取客户列表
     	}
     	
