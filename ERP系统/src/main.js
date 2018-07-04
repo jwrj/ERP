@@ -12,6 +12,9 @@ import iView from 'iview';
 //import '../static/iview/index.less';//这是自定义主题（两者只能存在一个）
 import 'iview/dist/styles/iview.css';//这是默认主题
 
+import Print from '../static/public/js/print.js'//打印插件
+Vue.use(Print) // 注册打印插件
+
 Vue.use(iView);
 
 //ajax组件

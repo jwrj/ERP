@@ -43,6 +43,28 @@
 	
 import tableModule from '@/components/table-module.vue';
 
+import axios from 'axios';
+
+let ajax = () => {
+	
+	return new Promise(resolve => {
+		
+		axios.post('system/formTable_list', {
+	    	page: 1,
+	    	pagesize: 3,
+	    	list_type: 1,
+		})
+		.then(response => {
+			resolve(response.data);
+		})
+		.catch(function (error) {
+			console.log(error);
+		});
+		
+	});
+	
+}
+
 export default {
 	components:{//模板
 		tableModule,
@@ -96,6 +118,21 @@ export default {
 	},
     watch:{//监测数据变化
     	
+	},
+	beforeRouteEnter (to, from, next) {//最早的钩子函数
+		
+		(async () => {//es7异步函数
+			console.time('testForEach');
+			console.log('开始');
+		    console.log(await ajax());//等待异步函数执行完成再执行await，await在async后面
+		    console.log('结束');
+		    console.timeEnd('testForEach');
+		})();
+		
+	    next(vm => {
+	      console.log(to)  //vm为vue的实例
+	      console.log('组件路由勾子beforeRouteEnter的next')
+	    })
 	}
 }
 </script>

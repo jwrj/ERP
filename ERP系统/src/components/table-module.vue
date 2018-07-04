@@ -42,10 +42,16 @@
 			
 			<div style="display:flex;align-items:center;margin-right:10px;">
 				
-				<p v-if="checkNumber">
+				<p v-if="checkNumber" style="margin-right:14px;">
 					已选
 					<span style="color:#ed3f14;">{{selectedNum}}</span>
 					条
+				</p>
+				
+				<p v-if="moneyShow && debtShow">
+					欠款总金额
+					<span style="color:#ed3f14;">{{sumMoney}}</span>
+					元
 				</p>
 				
 			</div>
@@ -476,6 +482,10 @@ export default {
 	 		type: Boolean,
 	 		default: false,
 	 	},
+	 	debtShow:{//欠款总金额
+	 		type: Boolean,
+	 		default: false,
+	 	},
 	 	
 	},
 	components:{//模板
@@ -499,6 +509,10 @@ export default {
         		delLoading:false,//删除按钮
         		
         	},
+        	
+        	moneyShow: false,//显示欠款金额
+        	
+        	sumMoney: 0,//欠款总金额
         	
         	tabDataList: [],//表格数据
         	
@@ -746,6 +760,8 @@ export default {
     	},
     	clientChange(val){//客户选择
     		
+    		this.getMoney(val);//获取欠款金额
+    		
     		this.stateInfo.client = val;
     		
     		this.setRoutePara();//设置路由参数
@@ -765,6 +781,30 @@ export default {
     		this.stateInfo.seek = this.screenVal.seekTxtVal;
     		
     		this.setRoutePara();//设置路由参数
+    		
+    	},
+    	
+    	//===============================================
+    	
+    	getMoney(user_id){//获取欠款金额
+    		
+    		if(user_id && this.debtShow){
+    			this.moneyShow = true;
+    		
+	    		this.$axios.post('orders/userArrears', {
+	    			for_user_id: user_id,
+	    			pid_tree_title_dataPage: 22,
+				})
+				.then(response => {
+					this.sumMoney = response.data.arrears_counts;
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			
+    		}else{
+    			this.moneyShow = false;
+    		}
     		
     	},
     	
@@ -1234,6 +1274,8 @@ export default {
     	if(this.clientSelect || this.ordClientSelect){
     		this.getClient();//获取客户列表
     	}
+    	
+    	this.getMoney(this.screenVal.client);//获取欠款金额
     	
     },
     

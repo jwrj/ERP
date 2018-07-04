@@ -15,6 +15,7 @@
 					stateListId="16"
 					seleSeekField="pid_status"
 					:ordClientSelect="true"
+					:debtShow="true"
 					
 					tableDataUrl="orders/order_list"
 					deleUrl="orders/order_delete"
@@ -46,7 +47,7 @@
 	    	
 	    </Modal>
 	    <!--回款记录弹窗-->
-		
+	    
 	</div>
 	
 </template>
@@ -119,9 +120,9 @@ export default {
                    	}
         		},
         		{
-                	title: '操作',
+                	title: '编辑物品单价',
                 	align:'center',
-                	width:80,
+                	width:120,
                 	handle:['details'],
                 },
         	],
@@ -161,4 +162,10 @@ export default {
 </script>
 
 <style scoped>
+	table, td, th {
+	    border: 1px solid black;
+	}
+	td{
+		padding:10px;
+	}
 </style>

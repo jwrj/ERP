@@ -65,7 +65,7 @@ import axios from 'axios';
 			
 			console.log('<--返回了数据',_res.data);
 			
-			if(_res.data.code == 1){
+			if(_res.data.code == 1){//获取数据成功
 				
 			}
 			
