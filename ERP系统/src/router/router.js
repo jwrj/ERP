@@ -362,6 +362,12 @@ export const appRouter = [
                 title:'模板管理',
                 component: resolve => { require(['@/views/systemSet/tempAdmin.vue'], resolve); }
             },
+            {
+                path:'test',
+                name:'test',
+                title:'测试页',
+                component: resolve => { require(['@/views/systemSet/test.vue'], resolve); }
+            },
         ]
     },
 ];

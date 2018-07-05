@@ -87,6 +87,7 @@
     		:confirmBut="confirmBut"
     		:module-type="componentType"
     		@upPageData="upPage"
+    		:printBtn="printBtn"
     	>
     	</cpm-mod>
     	<!--弹窗-->
@@ -486,6 +487,11 @@ export default {
 	 		type: Boolean,
 	 		default: false,
 	 	},
+	 	
+	 	printBtn: {//打印按钮
+			type: Boolean,
+	 		default: false,
+		},
 	 	
 	},
 	components:{//模板

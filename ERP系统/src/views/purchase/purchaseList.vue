@@ -10,6 +10,7 @@
 					ref="tabInstance"
 					:columns-list="columns"
 					:pageId="6"
+					:printBtn="true"
 					
 					tableDataUrl="items/purchase_list"
 					deleUrl="items/purchase_delete"

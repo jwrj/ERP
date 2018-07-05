@@ -13,6 +13,7 @@
 					:columns-list="columns"
 					:pageId="53"
 					:pidTreeClassId="10"
+					:printBtn="true"
 					
 					tableDataUrl="items/warehousing_list"
 					showUrl="items/warehousing_show"

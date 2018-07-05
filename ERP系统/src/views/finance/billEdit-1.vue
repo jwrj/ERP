@@ -35,6 +35,7 @@
 	    	<p slot="header">回款详情</p>
 	        <div>
 	        	<returned-money
+	        		ref="print"
         			v-if="modalShow"
         			:rowId="rowId"
         			rowUrl="orders/order_show"
@@ -42,6 +43,7 @@
 	        	</returned-money>
 	        </div>
 	        <div slot="footer">
+	        	<Button type="info" icon="ios-printer" class="no-print" @click="$print($refs.print.$el)">打印</Button>
 	            <Button @click="modalShow = false">关闭</Button>
 	        </div>
 	    	

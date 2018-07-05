@@ -77,7 +77,7 @@
 				
 			</Row>
 			
-			<Card style="margin-top:16px;">
+			<Card style="margin-top:16px;" class="no-print">
 				
 				<h2 slot="title">自定义（编辑）</h2>
 				

@@ -32,24 +32,26 @@
 	    		</form-edit>
 	    		
 	    		<form-view
+	    			ref="print"
 	    			v-if="moduleType === 'formView' && modal"
 	    			:form-view-id = "indentId"
 	    			:showUrl="viewUrl">
 	    		</form-view>
 	    		
-	    		<pParticulars 
+	    		<pParticulars
+	    			ref="print"
 	    			v-if="moduleType === 'pParticulars' && modal" 
 	    			:id="indentId" 
 	    			:showUrl="viewUrl">
 	    		</pParticulars>
 	    		
-	    		<purchaseEdit 
+	    		<purchaseEdit
 	    			v-if="moduleType === 'purchaseEdit' && modal" 
 	    			:id="indentId" 
 	    			:editUrl="editUrl">
 	    		</purchaseEdit>
 	    		
-	    		<roleEdit 
+	    		<roleEdit
 	    			v-if="moduleType === 'roleEdit' && modal" 
 	    			:row="row" 
 	    			:editUrl="editUrl">
@@ -64,6 +66,8 @@
 	    	</div>
 	    	
 	        <div slot="footer">
+	        	
+	        	<Button v-if="printBtn && (moduleType === 'formView' || moduleType === 'pParticulars')" type="info" icon="ios-printer" class="no-print" @click="$print($refs.print.$el)">打印</Button>
 	        	
 	        	<Button @click="modal = false">关闭</Button>
 	        	
@@ -186,6 +190,11 @@ export default {
 			}
 		},
 		
+		printBtn: {//打印按钮
+			type: Boolean,
+	 		default: false,
+		},
+		
 	},
     data () {
         return {
@@ -209,6 +218,7 @@ export default {
     	},
     },
     mounted(){//模板被渲染完毕之后执行
+    	console.log(this.$refs.print);
     },
 }
 </script>
