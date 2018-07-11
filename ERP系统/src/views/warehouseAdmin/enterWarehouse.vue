@@ -63,13 +63,11 @@
 				
 			</div>
 			
+			<div style="padding:16px;text-align: center;">
+				<Button type="primary" @click="submit('formInstance')">提交入库记录</Button>
+			</div>
+			
 		</Card>
-		
-		
-		<Card style="padding:16px;margin-top:16px;text-align: center;">
-			<Button type="primary" @click="submit('formInstance')">提交入库记录</Button>
-		</Card>
-		
 		
 		<!--弹窗选数据-->
 		<Modal v-model="modalShow" width="80%">

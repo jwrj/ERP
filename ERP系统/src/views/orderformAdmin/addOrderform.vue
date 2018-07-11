@@ -12,11 +12,13 @@
 			        </FormItem>
 			        
 			        <FormItem label="选择客户" prop="clientModel">
+			        	
 			            <Select v-model="formItem.clientModel" filterable placeholder="无数据" style="width:150px" @on-change="clientSele">
 					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					    </Select>
-					    <Button type="dashed" icon="plus-round" @click="addClient">新增客户</Button>
-					    <Button type="primary" icon="edit" @click="editClient">编辑客户</Button>
+					    
+					    <Button type="primary" icon="edit" @click="editClient">客户管理</Button>
+					    
 			        </FormItem>
 			        
 			        <FormItem label="送货信息">
@@ -42,13 +44,20 @@
     	<Card style="margin-top:15px;" v-if="addressIo">
     		
     		<div slot="title" style="display:flex;align-items: center;">
+    			
     			<h1>订单送货信息</h1>
+    			
     			<div style="margin-left: auto;">
+    				
 	    			<label style="margin-right:10px;font-size: 12px;">选择送货地址</label>
+	    			
 		    		<Select v-model="formItem.address" filterable placeholder="无数据" style="width:150px" @on-change="addressSele">
 				        <Option v-for="item in addressList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				    </Select>
+				    
+				    <Button type="primary" icon="edit" @click="editAddress">地址管理</Button>
     			</div>
+    			
     		</div>
     		
     		<div style="padding:15px;" v-if="addressList.length > 0">
@@ -433,14 +442,14 @@ export default {
 			}
 			
 		},
-		addClient(){//添加客户
+		editClient(){//客户管理
 			this.$router.replace({
 				name:'addClient',
 			});
 		},
-		editClient(){//编辑客户
+		editAddress(){//地址管理
 			this.$router.replace({
-				name:'clientList',
+				name:'address',
 			});
 		},
 		getAddress(){//获取地址列表

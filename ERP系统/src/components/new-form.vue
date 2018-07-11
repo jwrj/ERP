@@ -224,6 +224,7 @@ export default {
 		        			pid_tree_title:this.pageId,
 		        			use_dataPage_ids: this.useDataPageIdArr.length > 0 ? JSON.stringify(this.useDataPageIdArr) : null,
 		        			for_user_id: this.$parent.purchaseGoods ? this.$parent.formItem.clientModel : null,
+		        			pid_status: this.$parent.purchaseGoods ? 9 : 0,
 		        		}
 		        		
 		        		let infoString = JSON.stringify(info);

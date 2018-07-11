@@ -105,7 +105,29 @@ export const appRouter = [
 //  },
 
 //===============================================================================================
-
+	
+	{
+    	path:'/clientAdmin',
+        icon:'ios-people',
+        name:'clientAdmin',
+        title:'客户信息',
+        component: Frame,
+        children: [
+            {
+                path:'addClient',
+                name:'addClient',
+                title:'客户管理',
+                component: resolve => { require(['@/views/clientAdmin/addClient.vue'], resolve); }
+            },
+			{
+                path:'address',
+                name:'address',
+                title:'地址管理',
+                component: resolve => { require(['@/views/addressAdmin/address.vue'], resolve); }
+            },
+        ]
+    },
+    
     {
     	path:'/orderformAdmin',
         icon:'android-list',
@@ -127,6 +149,7 @@ export const appRouter = [
             },
         ]
     },
+    
     {
     	path:'/purchase',
         icon:'ios-cart',
@@ -148,6 +171,7 @@ export const appRouter = [
 	        },
         ]
     },
+    
     {
     	path:'/productionAdmin',
         icon:'social-buffer',
@@ -155,18 +179,6 @@ export const appRouter = [
         title:'生产管理',
         component: Frame,
         children: [
-//          {
-//              path:'Pconfiguration',
-//              name:'Pconfiguration',
-//              title:'生产配置',
-//              component: resolve => { require(['@/views/productionAdmin/Pconfiguration.vue'], resolve); }
-//          },
-//          {
-//              path:'productionList',
-//              name:'productionList',
-//              title:'生产列表',
-//              component: resolve => { require(['@/views/productionAdmin/productionList.vue'], resolve); }
-//          },
             {
                 path:'picking',
                 name:'picking',
@@ -181,29 +193,7 @@ export const appRouter = [
             },
         ]
     },
-    {
-    	path:'/delivergoods',
-        icon:'clipboard',
-        name:'delivergoods',
-        title:'发货管理',
-        component: Frame,
-        children: [
-            {
-                path:'orderDelivergoods',
-                icon:'clipboard',
-                name:'orderDelivergoods',
-                title:'订单发货',
-                component: resolve => { require(['@/views/delivergoods/orderDelivergoods.vue'], resolve); }
-            },
-            {
-                path:'delivergoodsList',
-                icon:'clipboard',
-                name:'delivergoodsList',
-                title:'发货单列表',
-                component: resolve => { require(['@/views/delivergoods/delivergoodsList.vue'], resolve); }
-            },
-        ]
-    },
+    
     {
     	path:'/warehouseAdmin',
         icon:'arrow-swap',
@@ -218,19 +208,26 @@ export const appRouter = [
                 component: resolve => { require(['@/views/warehouseAdmin/enterWarehouse.vue'], resolve); }
             },
             {
-                path:'comeWarehouse',
-                name:'comeWarehouse',
-                title:'出库管理',
-                component: resolve => { require(['@/views/warehouseAdmin/comeWarehouse.vue'], resolve); }
+                path:'orderDelivergoods',
+                name:'orderDelivergoods',
+                title:'发货管理',
+                component: resolve => { require(['@/views/delivergoods/orderDelivergoods.vue'], resolve); }
+            },
+            {
+                path:'delivergoodsList',
+                name:'delivergoodsList',
+                title:'发货单列表',
+                component: resolve => { require(['@/views/delivergoods/delivergoodsList.vue'], resolve); }
             },
             {
                 path:'warehouseList',
                 name:'warehouseList',
-                title:'出入库列表',
+                title:'入库列表',
                 component: resolve => { require(['@/views/warehouseAdmin/warehouseList.vue'], resolve); }
             },
         ]
     },
+    
     {
     	path:'/finance',
         icon:'ios-paper-outline',
@@ -247,102 +244,7 @@ export const appRouter = [
             },
         ]
     },
-    {
-    	path:'/goodsAdmin',
-        icon:'cube',
-        name:'goodsAdmin',
-        title:'物品管理',
-        component: Frame,
-        children: [
-            {
-                path:'addGoods',
-                name:'addGoods',
-                title:'单个添加物品',
-                component: resolve => { require(['@/views/goodsAdmin/addGoods.vue'], resolve); }
-            },
-            {
-                path:'batchAddGoods',
-                name:'batchAddGoods',
-                title:'批量添加物品',
-                component: resolve => { require(['@/views/goodsAdmin/batchAddGoods.vue'], resolve); }
-            },
-            {
-                path:'configuration',
-                name:'configuration',
-                title:'配置物品',
-                component: resolve => { require(['@/views/goodsAdmin/configuration.vue'], resolve); }
-            },
-            {
-                path:'goodsList',
-                name:'goodsList',
-                title:'物品列表',
-                component: resolve => { require(['@/views/goodsAdmin/goodsList.vue'], resolve); }
-            },
-        ]
-    },
-    {
-    	path:'/clientAdmin',
-        icon:'ios-people',
-        name:'clientAdmin',
-        title:'客户管理',
-        component: Frame,
-        children: [
-            {
-                path:'addClient',
-                name:'addClient',
-                title:'新增客户',
-                component: resolve => { require(['@/views/clientAdmin/addClient.vue'], resolve); }
-            },
-            {
-                path:'clientList',
-                name:'clientList',
-                title:'客户列表',
-                component: resolve => { require(['@/views/clientAdmin/clientList.vue'], resolve); }
-            },
-        ]
-    },
-    {
-    	path:'/addressAdmin',
-        icon:'person-stalker',
-        name:'addressAdmin',
-        title:'送货地址管理',
-        component: Frame,
-        children: [
-            {
-                path:'address',
-                name:'address',
-                title:'新增地址',
-                component: resolve => { require(['@/views/addressAdmin/address.vue'], resolve); }
-            },
-            {
-                path:'addressList',
-                name:'addressList',
-                title:'地址列表',
-                component: resolve => { require(['@/views/addressAdmin/addressList.vue'], resolve); }
-            },
-        ]
-    },
-    {
-    	path:'/userAdmin',
-        icon:'person-stalker',
-        name:'userAdmin',
-        title:'角色/用户',
-        component: Frame,
-        children: [
-            {
-                path:'addRole',
-                name:'addRole',
-                title:'角色管理',
-                component: resolve => { require(['@/views/userAdmin/addRole.vue'], resolve); }
-            },
-            {
-                path:'addUser',
-                name:'addUser',
-                title:'用户管理',
-                component: resolve => { require(['@/views/userAdmin/addUser.vue'], resolve); }
-            },
-        ]
-    },
+    
     {
     	path:'/systemSet',
         icon:'android-settings',
@@ -363,13 +265,26 @@ export const appRouter = [
                 component: resolve => { require(['@/views/systemSet/tempAdmin.vue'], resolve); }
             },
             {
-                path:'test',
-                name:'test',
-                title:'测试页',
-                component: resolve => { require(['@/views/systemSet/test.vue'], resolve); }
+                path:'addGoods',
+                name:'addGoods',
+                title:'物品管理',
+                component: resolve => { require(['@/views/goodsAdmin/addGoods.vue'], resolve); }
+            },
+            {
+                path:'addRole',
+                name:'addRole',
+                title:'角色管理',
+                component: resolve => { require(['@/views/userAdmin/addRole.vue'], resolve); }
+            },
+            {
+                path:'addUser',
+                name:'addUser',
+                title:'用户管理',
+                component: resolve => { require(['@/views/userAdmin/addUser.vue'], resolve); }
             },
         ]
     },
+    
 ];
 
 // ---------------所有上面定义的路由都要写在下面的routers里-------------------

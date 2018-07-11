@@ -4,7 +4,7 @@
 		
 		<Card>
 			
-			<h1 slot="title">批量添加物品（这里添加的物品都为成品）</h1>
+			<!--<h1 slot="title">批量添加物品（这里添加的物品都为成品）</h1>-->
 			
 			<div style="padding:16px;">
 				
@@ -81,6 +81,7 @@ export default {
 				.then(response => {
 					this.$Message.success('提交成功');
 					this.repeatData = response.data;
+					this.$emit('submitSucceed');
 				})
 				.catch(function (error) {
 					console.log(error);

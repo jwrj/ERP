@@ -13,7 +13,7 @@
 		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 			<!--客户下拉列表-->
-		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" placeholder="选择客户" style="width:200px;margin-right:10px;">
+		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" placeholder="查看客户库存" style="width:200px;margin-right:10px;">
 		        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 		    <!--搜索框-->
@@ -307,6 +307,8 @@ const scheduleButton = (_this,h,params) => {//进度（点击会跳转路由的�
 }
 
 const delButton = (_this,h,params) => {//删除按钮
+	
+	if(params.row.isadmin && params.row.isadmin == 1)return false;
 	
 	return h('Poptip',{
 		props: {

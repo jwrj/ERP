@@ -18,7 +18,7 @@
 		        
 			</div>
 			
-			<div v-if="procurementList.length > 0" style="padding:16px;">
+			<div v-if="procurementList.length > 0" style="padding:16px;border-bottom:1px solid #dddee1;">
 				
 				<h2 style="padding:0 0 10px;">点击要发货的订单</h2>
 				
@@ -31,26 +31,30 @@
 				</div>
 				
 			</div>
+				
+			<div style="padding:16px;">
+				
+		    	<Card>
+		    		
+		    		<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
+		    			<h2>需要发货的物品列表</h2>
+		    			<Button type="primary" size="small" @click="modalShow = true" v-show="cpmBtn">打开物品列表</Button>
+		    		</div>
+		    		
+		    		<div style="padding:16px;">
+		    			<Form class="tableFormInstance" ref="formInstance" :model="purchaseGoods" :show-message="false">
+		    				<Table border :columns="goodsColumns" :data="purchaseGoods.data"></Table>
+		    			</Form>
+		    		</div>
+		    		
+				</Card>
+				
+			</div>
 			
-		</Card>
-		
-    	<Card style="margin-top:16px;">
-    		
-    		<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
-    			<h1>需要发货的物品列表</h1>
-    			<Button type="primary" size="small" @click="modalShow = true" v-show="cpmBtn">打开物品列表</Button>
-    		</div>
-    		
-    		<div style="padding:16px;">
-    			<Form class="tableFormInstance" ref="formInstance" :model="purchaseGoods" :show-message="false">
-    				<Table border :columns="goodsColumns" :data="purchaseGoods.data"></Table>
-    			</Form>
-    		</div>
-    		
-		</Card>
-		
-		<Card style="padding:16px;margin-top:16px;text-align: center;">
-			<Button type="primary" @click="submit('formInstance')">提交发货单</Button>
+			<div style="padding:16px;text-align: center;">
+				<Button type="primary" @click="submit('formInstance')">提交发货单</Button>
+			</div>
+			
 		</Card>
 		
 		<!--弹窗选数据-->
@@ -206,11 +210,36 @@ export default {
                     title: '订单名称',
                     key: 'name',
                 },
+                {
+        			align:'center',
+        			width:80,
+        			title: '状态',
+                    render: (h, params) => {
+                    	console.log(params.row.pid_status);
+                    	if(params.row.pid_status == 9){
+                    		return h('span',{
+                    			style: {
+                    				color: '#bbbec4',
+                    			}
+                    		},'未发货');
+                    	}
+                    	if(params.row.pid_status == 10){
+                    		return h('span',{
+                    			style: {
+                    				color: '#19be6b',
+                    			}
+                    		},'已发货');
+                    	}
+                    	
+                    }
+        		},
         		{
                     title: '日期',
                     key: 'create_time',
                 },
         	],
+        	
+        	orderID: '',//订单ID
         	
         	demandNumber: [],//订单物品详情数据
         	
@@ -308,10 +337,12 @@ export default {
     	},
     	
     	pageChange(page){//页码改变
-    		this.getProcurementList(page);//采购列表
+    		this.getProcurementList(page);//订单列表
     	},
     	
     	onCurrentChange(currentRow){//单击某一行时触发
+    		
+    		this.orderID = currentRow.id;//订单ID
     		
     		this.dataFormTableIds = currentRow.dataFormTable_ids;//用到的表单集合
     		
@@ -437,6 +468,21 @@ export default {
 						    		this.purchaseGoods.data = [];
 						    		
 						    		this.$refs.tabInstance.submitSucceed();//提交成功后勾选功能数据还原
+						    		
+						    		let info = {
+						    			id: this.orderID,
+						    			pid_status:10,
+						    		};
+						    		
+						    		this.$axios.post('system/page_edit', {//修改订单状态
+    									info: JSON.stringify(info),
+									})
+									.then(response => {
+										this.getProcurementList(1);//订单列表
+									})
+									.catch(function (error) {
+										console.log(error);
+									});
 									
 									this.$Message.success('发货成功!');
 									

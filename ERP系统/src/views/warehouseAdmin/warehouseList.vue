@@ -4,17 +4,20 @@
 		
 		<Card>
 			
-			<h1 slot="title">出入库列表</h1>
+			<h1 slot="title">入库列表</h1>
 			
-			<div style="padding:16px;">
+			<div style="padding: 15px;">
 				
 				<table-module
 					ref="tabInstance"
 					:columns-list="columns"
-					stateListId="10"
-					seleSeekField="pid_tree_title"
+					:pageId="8"
 					:pidTreeClassId="10"
+					
 					tableDataUrl="items/warehousing_list"
+					showUrl="items/warehousing_show"
+					componentViewType="formView"
+					componentEditType="formEdit"
 				>
 				</table-module>
 				
@@ -30,38 +33,17 @@
 	
 import tableModule from '@/components/table-module.vue';
 
-import warehouseP from '@/components/warehouseP.vue';
-	
 export default {
 	components:{//模板
 		tableModule,
 	},
 	props:{
 		
-//		name: {
-//			type: Array | Number | String | Object,//类型
-//			required: true,//必传
-//			default: '',//默认值
-//		}
-		
 	},
     data () {//数据
         return {
         	
         	columns: [
-        		{
-        			title: '详情',
-        			width:60,
-        			align: 'conter',
-                   	type: 'expand',
-                   	render: (h, params) => {
-                        return h(warehouseP, {
-                            props: {
-                            	rowId: params.row.id,
-                            },
-                        })
-                    }
-                },
         		{
         			align:'center',
         			width:100,
@@ -76,6 +58,12 @@ export default {
         			title: '日期',
                     key: 'create_time',
         		},
+        		{
+                	title: '操作',
+                	align:'center',
+                	width:150,
+                	handle:['edit2','details','delete'],
+                },
         	],
         	
         }

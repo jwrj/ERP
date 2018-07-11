@@ -92,7 +92,7 @@ export default {
         	columns:[
         		{
         			align:'center',
-        			width:70,
+        			width:100,
         			title: 'ID',
                     key: 'id',
         		},
@@ -102,13 +102,35 @@ export default {
         		},
         		{
         			title: '角色ID',
-                    key: 'pid_sys_role',
+        			width:100,
+        			align:'center',
+                    render: (h, params) => {
+                    	if(params.row.pid_sys_role == 0){
+                    		return h('span',{
+                    			style: {
+                    				color: '#bbbec4',
+                    			}
+                    		},'无角色');
+                    	}else if(params.row.isadmin == 1){
+                    		return h('span',{
+                    			style: {
+                    				color: '#ed3f14',
+                    			}
+                    		},'最高权限');
+                    	}else{
+                    		return h('span',{
+                    			style: {
+                    				color: '#2d8cf0',
+                    			}
+                    		},params.row.pid_sys_role);
+                    	}
+                    }
         		},
         		{
                 	title: '操作',
                 	align:'center',
                 	width:120,
-                	handle:['edit2','delete'],
+                	handle: ['edit2','delete'],
                 },
         	],
         	
@@ -116,7 +138,6 @@ export default {
                 userName: '',
                 passwd: '',
                 passwdCheck: '',
-                
             },
             
             ruleInline: {
@@ -147,6 +168,13 @@ export default {
 					})
 					.then(response => {
 						this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
+						
+						this.formInline = {//清空表单值
+			                userName: '',
+			                passwd: '',
+			                passwdCheck: '',
+			           	};
+			           	
 						this.$Message.success('创建成功!');
 					})
 					.catch(function (error) {

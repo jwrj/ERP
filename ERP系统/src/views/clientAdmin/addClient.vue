@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Card style="margin-bottom:15px;">
+		<Card style="margin-bottom:2px;">
 			<div style="padding:24px 0 0;">
 				
     			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="80" inline>
@@ -19,10 +19,35 @@
 		<new-form
 			:pid-tree-class="5"
 			:pageId="2"
-			titleName="客户信息"
+			titleName="客户信息表单"
 			buttonName="新增客户"
+			@submitChange="submitChange"
 		>
 		</new-form>
+		
+		<Card style="margin-top:16px;">
+			
+			<h1 slot="title">客户列表</h1>
+			
+			<div style="padding: 15px;">
+				
+				<!--如果出现两个表格组件路由会有同步现象-->
+				<table-module
+					ref="tabInstance"
+					:columns-list="columns"
+					:pageId="2"
+					
+					tableDataUrl="oa/customer_list"
+					deleUrl="oa/customer_delete"
+					showUrl="oa/customer_show"
+					componentViewType="formView"
+					componentEditType="formEdit"
+				>
+				</table-module>
+				
+			</div>
+			
+		</Card>
 		
 	</div>
 
@@ -31,10 +56,13 @@
 <script>
 	
 import newForm from '@/components/new-form.vue';
+
+import tableModule from '@/components/table-module.vue';
 	
 export default {
 	components:{//模板
 		newForm,
+		tableModule,
 	},
     data () {//数据
         return {
@@ -49,10 +77,37 @@ export default {
                 ],
 			},
 			
+			columns:[
+        		{
+        			align:'center',
+        			width:70,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '名称',
+                    key: 'name',
+                    editable: true,
+        		},
+        		{
+        			
+        			title: '日期',
+                    key: 'create_time',
+        		},
+        		{
+                	title: '操作',
+                	align:'center',
+                	width:150,
+                	handle:['edit2','details','delete'],
+                },
+        	],
+			
         }
     },
     methods: {//方法
-    	
+    	submitChange(){
+			this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
+    	},
     },
     computed:{//计算属性
         	

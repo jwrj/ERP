@@ -64,9 +64,26 @@ export default {
         		},
         		{
         			align:'center',
-        			width:70,
+        			width:80,
         			title: '状态',
-                    key: 'pid_status',
+                    render: (h, params) => {
+                    	console.log(params.row.pid_status);
+                    	if(params.row.pid_status == 9){
+                    		return h('span',{
+                    			style: {
+                    				color: '#bbbec4',
+                    			}
+                    		},'未发货');
+                    	}
+                    	if(params.row.pid_status == 10){
+                    		return h('span',{
+                    			style: {
+                    				color: '#19be6b',
+                    			}
+                    		},'已发货');
+                    	}
+                    	
+                    }
         		},
         		{
         			title: '日期',

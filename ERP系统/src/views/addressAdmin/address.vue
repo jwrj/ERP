@@ -2,12 +2,12 @@
 
 	<div>
 		
-		<Card style="margin-bottom:15px;">
+		<Card style="margin-bottom:2px;">
 			<div style="padding:24px 16px 0;">
 				
-    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="46" inline>
+    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="70" inline>
     				
-			        <FormItem label="名称" prop="name">
+			        <FormItem label="地址名称" prop="name">
 			            <Input v-model="formItem.name" style="width: 160px;" placeholder="请输入名称"></Input>
 			        </FormItem>
 			        
@@ -20,9 +20,31 @@
 			:pid-tree-class="6"
 			:pageId="27"
 			titleName="送货地址表单"
-			buttonName="添加送货地址"
+			buttonName="新增地址"
+			@submitChange="submitChange"
 		>
 		</new-form>
+		
+		<Card style="margin-top:16px;">
+			
+			<h1 slot="title">地址列表</h1>
+			
+			<div style="padding: 15px;">
+				
+				<!--如果出现两个表格组件路由会有同步现象-->
+				<table-module
+					ref="tabInstance"
+					:columns-list="columns"
+					:pageId="27"
+					
+					componentViewType="formView"
+					componentEditType="formEdit"
+				>
+				</table-module>
+				
+			</div>
+			
+		</Card>
 		
 	</div>
 
@@ -32,9 +54,12 @@
 	
 import newForm from '@/components/new-form.vue';
 	
+import tableModule from '@/components/table-module.vue';	
+
 export default {
 	components:{//模板
 		newForm,
+		tableModule,
 	},
     data () {//数据
         return {
@@ -49,10 +74,37 @@ export default {
                 ],
 			},
 			
+			columns:[
+        		{
+        			align:'center',
+        			width:70,
+        			title: 'ID',
+                    key: 'id',
+        		},
+        		{
+        			title: '名称',
+                    key: 'name',
+                    editable: true,
+        		},
+        		{
+        			
+        			title: '日期',
+                    key: 'create_time',
+        		},
+        		{
+                	title: '操作',
+                	align:'center',
+                	width:150,
+                	handle:['edit2','details','delete'],
+                },
+        	],
+			
         }
     },
     methods: {//方法
-    	
+    	submitChange(){
+			this.$refs.tabInstance.getDataList(this.$refs.tabInstance.stateInfo);//获取数据列表
+    	},
     },
     computed:{//计算属性
         	

@@ -4,7 +4,7 @@
 		
 		<Card>
 			
-			<h1 slot="title">修改用户信息</h1>
+			<h1 slot="title">修改用户信息（非必填）</h1>
 			
 			<div style="border-bottom: 1px solid #dddee1;padding:20px 16px 0;">
 				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
@@ -23,13 +23,13 @@
 			        
 			    </Form>
 			    <div style="text-align: center;margin-bottom:16px;">
-			    	<Button type="primary" @click="usermod('formInline')">保存</Button>
+			    	<Button type="primary" @click="usermod('formInline')">保存修改</Button>
 			    </div>
 			</div>
 			
 		</Card>
 		
-		<Card style="margin-top:16px;">
+		<Card style="margin-top:16px;" v-if="row.isadmin != 1">
 			
 			<h1 slot="title">给用户指定角色</h1>
 			

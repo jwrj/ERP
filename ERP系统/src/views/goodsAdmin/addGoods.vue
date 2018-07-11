@@ -4,7 +4,29 @@
 		
 		<Card>
 			
-			<h1 slot="title">添加物品</h1>
+			<div slot="title" style="display:flex;align-items: center;justify-content: space-between;">
+				<h1>操作/选择</h1>
+				<Button size="small" type="primary" @click="configurationShow = true">点击打开物品配置表</Button>
+			</div>
+			
+			<div style="padding:16px;">
+				
+				<span style="margin-right:10px;font-size: 12px;">选择添加类型</span>
+				
+				<RadioGroup v-model="addType">
+			        <Radio :label="0">
+			            <span>单个添加</span>
+			        </Radio>
+			        <Radio :label="1">
+			            <span>批量添加</span>
+			        </Radio>
+			    </RadioGroup>
+			
+			</div>
+			
+		</Card>
+		
+		<Card v-if="addType == 0" style="margin-top:2px;">
 			
 			<div style="padding:16px;">
 				
@@ -49,17 +71,17 @@
 				    
 				</Form>
 				
-			</div>
-			
-			<div style="text-align: center;padding-bottom:16px;" v-if="!formsShow">
-				<Button type="primary" @click="add('formItem')">新增物品</Button>
+				<div style="text-align: center;" v-if="!formsShow">
+					<Button type="primary" @click="add('formItem')">新增物品</Button>
+				</div>
+				
 			</div>
 			
 		</Card>
 		
 		<new-form
-			style="margin-top:4px;"
-			v-if="formsShow"
+			style="margin-top:2px;"
+			v-if="formsShow && addType == 0"
 			:pid-tree-class="26"
 			:pageId="52"
 			titleName="规格"
@@ -70,7 +92,32 @@
 		>
 		</new-form>
 		
+		<batch-add-goods @submitSucceed="submitChange" v-if="addType == 1" style="margin-top:2px;"></batch-add-goods>
+		
 		<goods-list ref="goodsInstance" style="margin-top:16px;"></goods-list>
+		
+		
+		<Modal
+    		v-model="configurationShow"
+    		width="80%"
+    	>
+	    	<p slot="header">配置</p>
+	    	
+	    	<div>
+	    		
+	    		<configuration v-if="configurationShow"></configuration>
+	    		
+	    	</div>
+	    	
+	    	<div slot="footer">
+	        	
+	        	<Button @click="configurationShow = false">关闭</Button>
+	        	
+	        	<Button type="primary" @click="updateCallBack">更新物品列表</Button>
+	        	
+	        </div>
+	    	
+	    </Modal>
 		
 	</div>
 	
@@ -82,13 +129,23 @@ import newForm from '@/components/new-form.vue';
 
 import goodsList from '@/views/goodsAdmin/goodsList.vue';
 
+import batchAddGoods from '@/views/goodsAdmin/batchAddGoods.vue';
+
+import configuration from '@/views/goodsAdmin/configuration.vue';
+
 export default {
 	components:{//模板
 		newForm,
 		goodsList,
+		batchAddGoods,
+		configuration,
 	},
     data () {//数据
         return {
+        	
+        	configurationShow: false,
+        	
+        	addType: 0,
         	
         	goodsClassList: [],//物品分类数据列表
         	
@@ -219,8 +276,18 @@ export default {
             });
             
         },
+        //==========================================
         
+        submitChange(){//批量添加成功回调
+			this.$refs.goodsInstance.$refs.tabInstance.getDataList(this.$refs.goodsInstance.$refs.tabInstance.stateInfo);//获取数据列表
+        },
         submitCallBack(){//提交回调
+			this.$refs.goodsInstance.$refs.tabInstance.getDataList(this.$refs.goodsInstance.$refs.tabInstance.stateInfo);//获取数据列表
+        },
+        updateCallBack(){//弹窗更新回调
+        	
+        	this.configurationShow = false;
+        	
 			this.$refs.goodsInstance.$refs.tabInstance.getDataList(this.$refs.goodsInstance.$refs.tabInstance.stateInfo);//获取数据列表
         },
         
