@@ -139,7 +139,7 @@
 			            				:fade="false"
 			            				:name="item.name" 
 			            				:key="item.name"
-			            				:closable="index === 0 ? false : true" 
+			            				:closable="item.name == 'home_index' ? false : true" 
 			            				:color="item.name === $route.name ? 'blue' : 'default'" 
 			            				@click.native="tagClick(index)" 
 			            				@on-close="removeTag">
@@ -150,14 +150,14 @@
 	            		</div>
 	            		
 	            		<div class="R">
-	            			<Dropdown>
-						        <Button type="primary">
+	            			<Dropdown @on-click="DropdownMenuClick">
+						        <Button type="primary" size="small">
 						           	标签管理
 						            <Icon type="arrow-down-b"></Icon>
 						        </Button>
 						        <DropdownMenu slot="list">
-						            <DropdownItem disabled>全部关闭</DropdownItem>
-						            <DropdownItem disabled>关闭其他</DropdownItem>
+						            <DropdownItem name="all">关闭全部</DropdownItem>
+						            <DropdownItem name="else">关闭其他</DropdownItem>
 						        </DropdownMenu>
 						    </Dropdown>
 	            		</div>
@@ -332,6 +332,59 @@
 					
         		}
         		else{
+        			
+        		}
+        		
+        	},
+        	DropdownMenuClick(name){//标签管理
+        		
+        		if(name == 'all'){//关闭全部
+        			
+        			this.$store.state.mainFrame.pageOpenedList = [];
+        			
+        			if(this.$route.name == 'home_index'){
+        				
+		    			this.$store.commit('currentOpenPageList',this.$route);
+		        		this.tagArr = this.$store.state.mainFrame.pageOpenedList;
+        				
+        			}else{
+        				
+        				this.$router.replace({
+							name:'home_index'
+						});
+        				
+        			}
+        			
+        		}else if(name == 'else'){//关闭其他
+        			
+        			if(this.$route.name == 'home_index'){
+        				
+        				this.$store.state.mainFrame.pageOpenedList = [];
+        				
+        			}else{
+        				
+        				let arr = [
+        					{
+								title: '首页',
+								path: '',
+								name: 'home_index'
+							}
+        				];
+        				
+        				this.$store.state.mainFrame.pageOpenedList.forEach(item => {
+        					
+        					if(item.name == this.$route.name){
+        						arr.push(item)
+        					}
+        					
+        				});
+        				
+        				this.$store.state.mainFrame.pageOpenedList = arr;
+        				
+        			}
+        			
+	    			this.$store.commit('currentOpenPageList',this.$route);
+	        		this.tagArr = this.$store.state.mainFrame.pageOpenedList;
         			
         		}
         		
