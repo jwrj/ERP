@@ -13,6 +13,8 @@
 					:columns-list="columns"
 					:pageId="8"
 					:pidTreeClassId="10"
+					stateListId="19"
+					seleSeekField="pid_status"
 					
 					tableDataUrl="items/warehousing_list"
 					showUrl="items/warehousing_show"

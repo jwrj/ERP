@@ -13,7 +13,7 @@
 		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 			<!--客户下拉列表-->
-		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" placeholder="查看客户库存" style="width:200px;margin-right:10px;">
+		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" :placeholder="debtShow ? '查看客户欠款金额' : '查看客户库存'" style="width:200px;margin-right:10px;">
 		        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 		    <!--搜索框-->
