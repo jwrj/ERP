@@ -84,8 +84,7 @@
 									sessionStorage.setItem('access','['+response.data.authority_arr+']');//把权限存起来
 								}
 								this.$router.replace({//登陆成功跳转路由
-//									name:'home_index'
-									name:'orderformList'
+									name:'home_index'
 								});
 								this.$Message.success(response.msg);
 						    }

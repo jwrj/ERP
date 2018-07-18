@@ -50,8 +50,7 @@ router.beforeEach((to, from, next) => {
 			
 			//console.log('已经登录，而且当前页面是登录页');
 			next({
-//				name: 'home_index'
-				name: 'orderformList'
+				name: 'home_index'
 			});
 			
 		}else {
