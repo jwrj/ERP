@@ -457,6 +457,8 @@ export default {
     								
     								pid_tree_class: 10,
     								
+    								pid_status: this.formData.way,//入库形式
+    								
     							}
 			                	
 			                	let data = [];//购买的物品列表

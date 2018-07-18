@@ -9,7 +9,7 @@ import store from './store/index.js'
 
 //UI组件
 import iView from 'iview';
-//import '../static/iview/index.less';//这是自定义主题（两者只能存在一个）
+//import '../static/my-theme/index.less';//这是自定义主题（两者只能存在一个）
 import 'iview/dist/styles/iview.css';//这是默认主题
 
 import Print from '../static/public/js/print2.js'//打印插件

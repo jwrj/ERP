@@ -2,17 +2,29 @@
 	<div class="layout">
         <Layout :style="{minHeight: '100vh'}">
         	<!--左边栏-->
-            <Sider class="Sider" ref="side1" hide-trigger collapsible :collapsed-width="60" v-model="isCollapsed">
-            	<div class="sider-box">
-            		<div class="logo">ERP系统</div>
+            <Sider class="Sider" :style="themeType == 'light' ? {background: '#fff'} : {background: '#495060'}" ref="side1" hide-trigger collapsible :collapsed-width="60" v-model="isCollapsed">
+            	
+            	<div class="sider-box" :style="isCollapsed ? { overflowY:'hidden', borderRight:'1px solid #DDDEE1' } : ''">
+            		
+            		<!--logo-->
+            		<div class="logo" :style="!isCollapsed && themeType == 'light' ? { borderRight:'1px solid #DDDEE1' } : ''">
+            			
+            			<div>
+            				<span>ERP系统</span>
+            				<sup style="font-size: 14px;">v1.0.1</sup>
+            			</div>
+            			
+            		</div>
+            		
             		<!--显示文字-->
 	            	<Menu
+	            		class="menu"
 	            		ref="sideMenu"
 	            		:accordion="true"
 	            		:active-name="$route.name"
 	            		:open-names="openNames"
-	            		theme="dark"
-	            		width="200px"
+	            		:theme="themeType"
+	            		width="auto"
 	            		v-show="!isCollapsed"
 	            		@on-select="changeMenu"
 	            		@on-open-change="menuOpenChange"
@@ -22,19 +34,19 @@
 	            			
 	            			<MenuItem v-if="item.children.length <= 1" :name="item.children[0].name" :key="'menuitem' + item.name">
 					            <Icon :type="item.children[0].icon || item.icon" :key="'menuicon' + item.name"></Icon>
-					        	<span :key="'title' + item.name">{{item.title}}</span>
+					        	<span class="menu-text" :key="'title' + item.name">{{item.title}}</span>
 					        </MenuItem>
 	            			
 			                <Submenu v-if="item.children.length > 1" :name="item.name" :key="item.name">
 			                    <template slot="title">
 			                        <Icon :type="item.icon"></Icon>
-			                      	<span>{{item.title}}</span>
+			                      	<span class="menu-text">{{item.title}}</span>
 			                    </template>
 			                    
 			                    <template v-for="child in item.children">
 				                    <MenuItem :name="child.name" :key="'menuitem' + child.name">
 				                    	<Icon :type="child.icon" :key="'icon' + child.name"></Icon>
-				                    	<span :key="'title' + child.name">{{child.title}}</span>
+				                    	<span class="menu-text" :key="'title' + child.name">{{child.title}}</span>
 				                    </MenuItem>
 				                </template>
 			                </Submenu>
@@ -42,6 +54,7 @@
 	            		</template>
 	            		
 		            </Menu>
+		            
 		       		<!--只显示图标-->
 		            <div class="min-nav" v-show="isCollapsed">
 		            	<div v-for="(item,index) in menuList">
@@ -49,7 +62,7 @@
 		            		<Dropdown v-if="item.children.length <= 1" key="index" :transfer="true" placement="right-start" @on-click="changeMenu">
 		            			
 		            			<div class="icon" @click="changeMenu(item.children[0].name)">
-		            				<Icon :type="item.children[0].icon || item.icon"></Icon>
+		            				<Icon :color="themeType == 'light' ? '#495060' : ''" :type="item.children[0].icon || item.icon"></Icon>
 		            			</div>
 		            			
 						        <DropdownMenu slot="list">
@@ -61,7 +74,7 @@
 		            		<Dropdown v-if="item.children.length > 1" :key="index" :transfer="true" placement="right-start" @on-click="changeMenu">
 		            			
 		            			<div class="icon">
-		            				<Icon :type="item.icon"></Icon>
+		            				<Icon :color="themeType == 'light' ? '#495060' : ''" :type="item.icon"></Icon>
 		            			</div>
 		            			
 						        <DropdownMenu slot="list">
@@ -74,13 +87,15 @@
 						    
 		            	</div>
 		            </div>
+		            
             	</div>
+            	
             </Sider>
-            <!--左边栏-->
+			            
             <Layout>
             	<!--头部-->
 	            <Header class="Header">
-	            	<Card class="hCard" :bordered="false" dis-hover>
+	            	<div class="hCard">
 	            		<div class="box">
 	            			<!--收起菜单按钮-->
 	            			<div class="left">
@@ -98,19 +113,58 @@
 	            			<!--设置/个人用户-->
 	            			<div class="right">
 	            				<div class="L">
-	            					未开发功能区...
+									
+									<!--<div style="color: #bbbec4;">功能1</div>
+									
+									<div style="color: #bbbec4;">功能2</div>
+									
+									<div style="color: #bbbec4;">功能3</div>-->
+									
+									<div>
+										<Dropdown trigger="click" @on-click="themeClick">
+									        <a>
+									        	<Icon type="tshirt" size="18" v-if="themeType == 'dark'"></Icon>
+									        	<Icon type="tshirt-outline" size="18" v-if="themeType == 'light'"></Icon>
+									            <Icon type="arrow-down-b"></Icon>
+									        </a>
+									        <DropdownMenu slot="list">
+									        	
+									        	<template v-for="item in themeList">
+										            <DropdownItem :name="item.type">
+										            	<Icon :type="item.icon" size="14" :color="item.color"></Icon>
+										            	<span :style="{color: item.color}">{{item.name}}</span>
+										            </DropdownItem>
+									        	</template>
+									            
+									        </DropdownMenu>
+									    </Dropdown>
+									</div>
+									
 	            				</div>
 	            				<div class="R">
             						<div class="dropdown-box">
             							<Dropdown placement="bottom-end" trigger="click" @on-click="userFunction">
-									        <a href="javascript:void(0)">
+									        <a>
 									        	<span>{{userName}}</span>
 									            <Icon type="arrow-down-b"></Icon>
 									        </a>
 									        <DropdownMenu slot="list">
-									            <DropdownItem name="myCenter" disabled>个人中心</DropdownItem>
-									            <DropdownItem name="set" disabled>设置</DropdownItem>
-									            <DropdownItem name="exit">退出登录</DropdownItem>
+									        	
+									            <DropdownItem name="myCenter" disabled>
+									            	<Icon type="person" size="14"></Icon>
+									            	<span>个人中心</span>
+									            </DropdownItem>
+									            
+									            <DropdownItem name="set" disabled>
+									            	<Icon type="gear-a" size="14"></Icon>
+									            	<span>设置</span>
+									            </DropdownItem>
+									            
+									            <DropdownItem name="exit">
+									            	<Icon type="log-out" size="14"></Icon>
+									            	<span>退出登录</span>
+									            </DropdownItem>
+									            
 									        </DropdownMenu>
 									    </Dropdown>
             						</div>
@@ -126,7 +180,7 @@
 	            			</div>
 	            			<!--设置/个人用户-->
 	            		</div>
-	            	</Card>
+	            	</div>
 	            	
 	            	<div class="tag">
 	            		
@@ -150,14 +204,23 @@
 	            		</div>
 	            		
 	            		<div class="R">
-	            			<Dropdown @on-click="DropdownMenuClick">
+	            			<Dropdown @on-click="DropdownMenuClick" :transfer="true">
 						        <Button type="primary" size="small">
 						           	标签管理
 						            <Icon type="arrow-down-b"></Icon>
 						        </Button>
 						        <DropdownMenu slot="list">
-						            <DropdownItem name="all">关闭全部</DropdownItem>
-						            <DropdownItem name="else">关闭其他</DropdownItem>
+						        	
+						            <DropdownItem name="all">
+						            	<Icon type="close-circled"></Icon>
+						            	<span>关闭全部</span>
+						            </DropdownItem>
+						            
+						            <DropdownItem name="else">
+						            	<Icon type="minus-circled"></Icon>
+						            	<span>关闭其他</span>
+						            </DropdownItem>
+						            
 						        </DropdownMenu>
 						    </Dropdown>
 	            		</div>
@@ -201,6 +264,59 @@
                	
                	tagArr:this.$store.state.mainFrame.pageOpenedList,//tag标签列表
                	
+               	themeList: [//主题列表
+               		{
+               			type: 'b_dark',
+               			color: '#2d8cf0',
+               			icon: 'tshirt',
+               			name: '宁静蓝'
+               		},
+               		{
+               			type: 'g_dark',
+               			color: '#19be6b',
+               			icon: 'tshirt',
+               			name: '清新绿'
+               		},
+               		{
+               			type: 'y_dark',
+               			color: '#ff9900',
+               			icon: 'tshirt',
+               			name: '尊贵黄'
+               		},
+               		{
+               			type: 'r_dark',
+               			color: '#ed3f14',
+               			icon: 'tshirt',
+               			name: '热情红'
+               		},
+               		{
+               			type: 'b_light',
+               			color: '#2d8cf0',
+               			icon: 'tshirt-outline',
+               			name: '宁静蓝'
+               		},
+               		{
+               			type: 'g_light',
+               			color: '#19be6b',
+               			icon: 'tshirt-outline',
+               			name: '清新绿'
+               		},
+               		{
+               			type: 'y_light',
+               			color: '#ff9900',
+               			icon: 'tshirt-outline',
+               			name: '尊贵黄'
+               		},
+               		{
+               			type: 'r_light',
+               			color: '#ed3f14',
+               			icon: 'tshirt-outline',
+               			name: '热情红'
+               		},
+               	],
+               	
+               	themeType: 'dark',//默认主题类型
+               	
             }
         },
 		computed:{
@@ -242,6 +358,7 @@
             },
             changeMenu(menuName){//获取到点击当前的左侧菜单name值
             	
+            	//路由跳转
             	this.$router.push({
                     name: menuName
                 });
@@ -299,10 +416,18 @@
         	},
             userFunction(name){
             	if(name === 'myCenter'){//个人中心
-        			console.log('点击了个人中心');
+            		
+//      			this.$router.replace({
+//	                    name: 'myCenter_index'
+//	                });
+	                
         		}
         		else if(name === 'set'){//设置
-        			console.log('点击了设置');
+        			
+//      			this.$router.replace({
+//	                    name: 'set_index'
+//	                });
+	                
         		}
         		else if(name === 'exit'){//退出登录
         			
@@ -346,6 +471,8 @@
         				
 		    			this.$store.commit('currentOpenPageList',this.$route);
 		        		this.tagArr = this.$store.state.mainFrame.pageOpenedList;
+		        		
+		        		this.tagSlide();//tag溢出滑动
         				
         			}else{
         				
@@ -385,9 +512,55 @@
         			
 	    			this.$store.commit('currentOpenPageList',this.$route);
 	        		this.tagArr = this.$store.state.mainFrame.pageOpenedList;
+	        		
+	        		this.tagSlide();//tag溢出滑动
         			
         		}
         		
+        	},
+        	themeClick(name){//主题切换
+        		
+        		let color = name.slice(0,1);
+        		
+        		let themeType = name.slice(2);
+        		
+        		let themeData = {
+        			user: sessionStorage.getItem('user'),
+        			type: themeType,
+        			color: color,
+        		};
+        		
+        		localStorage.setItem('themeData',JSON.stringify(themeData));
+        		
+        		this.setTheme();
+        		
+        	},
+        	setTheme(){//设置主题
+        		
+        		let themeData = JSON.parse(localStorage.getItem('themeData'));
+        			
+    			let themeLink = document.querySelector('link[name="theme"]');
+    			
+    			if(themeData){
+    				
+    				this.themeType = themeData.type;
+    				
+    			}else{
+    				
+    				this.themeType = 'dark';
+    				
+    			}
+    			
+    			if(themeData && themeData.color != 'b'){
+    				
+    				themeLink.setAttribute('href', 'static/my-theme/'+ themeData.color +'.css');
+    				
+    			}else{
+    				
+    				themeLink.setAttribute('href', '');
+    				
+    			}
+    			
         	},
         	
 	    },
@@ -401,7 +574,9 @@
 	        });
 	        
 			this.tagSlide();//tag溢出滑动
-	        
+			
+			this.setTheme();
+			
 	    },
 	    created () {//实例被创建完毕之后执行
 	    	
@@ -437,7 +612,7 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 	.Sider{
 		position: relative;
 	}
@@ -451,13 +626,27 @@
 		overflow-x:hidden;
 	}
 	.Sider .sider-box .logo{
+		display:flex;
+		align-items: center;
+		justify-content: center;
 		height:64px;
-		line-height:64px;
-		text-align:center;
-		color:#fff;
-		background:#2d8cf0;
-		font-size:24px;
-		overflow: hidden;
+		/*border-right:1px solid #DDDEE1;*/
+		div {
+			width:90%;
+			height:46px;
+			line-height:46px;
+			font-size:24px;
+			text-align: center;
+			color:#fff;
+			background:#2d8cf0;
+			border-radius: 6px;
+			overflow: hidden;
+		}
+	}
+	.Sider .sider-box .menu .menu-text{
+		display:inline-block;
+		white-space: nowrap;
+		position: absolute;
 	}
 	.min-nav>div{
 		text-align: center;
@@ -466,7 +655,7 @@
 		display:inline-block;
 		width:65px;
 		padding:14px 0;
-		color: rgba(255,255,255,.7);
+		color: #fff;
 		cursor: pointer;
 	}
 	.min-nav .icon i{
@@ -535,6 +724,7 @@
 		left:0;
 		display:flex;
 		z-index:999;
+		background: #fff;
 	}
 	.hCard .box .left i{
 		margin:auto;
@@ -542,31 +732,37 @@
 		color:#1c2438;
 	}
 	.hCard .box .center{
-		left:60px;
-		right:400px;
-		padding-left:30px;
+		left:70px;
 		line-height:64px;
-		overflow: hidden;
+		background: #fff;
 	}
 	.hCard .box .right{
-		width:400px;
-		right:0;
+		right:16px;
 		display:flex;
+		background: #fff;
 	}
 	.hCard .box .right .L{
-		line-height:64px;
-		flex-shrink:0;
-		color:#bbbec4;
+		display: flex;
+		align-items: center;
+		margin-right:10px;
+	}
+	.hCard .box .right .L div{
+		margin: 0 10px;
 	}
 	.hCard .box .right .R{
 		display:flex;
 		align-items: center;
 		margin-left:auto;
-		padding:0 15px;
 		flex-shrink:0;
 	}
 	.hCard .box .right .R .avatar{
 		margin-left:10px;
 		flex-shrink: 0;
+	}
+</style>
+
+<style>
+	.ivu-select-dropdown{
+		width: auto !important;
 	}
 </style>

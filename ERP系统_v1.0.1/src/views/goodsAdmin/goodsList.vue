@@ -108,6 +108,12 @@ export default {
         			title: '名称',
                     key: 'name',
         		},
+        		{
+        			align:'center',
+        			width:120,
+        			title: '数量',
+        			key: 'number',
+        		},
         	],
         	
         	data3: [],
@@ -188,7 +194,15 @@ export default {
                 				},
                 				on: {
                            			click(){
-                           				_this.warehouseRecord(params.row.id,2);//出入库记录
+                           				
+                           				_this.warehouseRecord(params.row.id,2);//出库记录
+                           				
+                           				_this.columns3.forEach(item => {
+                           					if(item.key == 'number'){
+                           						item.title = '出库数量';
+                           					}
+                           				})
+                           				
                            			}
                            		},
                 			},'出'),
@@ -203,7 +217,15 @@ export default {
                 				},
                 				on: {
                            			click(){
-                           				_this.warehouseRecord(params.row.id,1);//出入库记录
+                           				
+                           				_this.warehouseRecord(params.row.id,1);//入库记录
+                           				
+                           				_this.columns3.forEach(item => {
+                           					if(item.key == 'number'){
+                           						item.title = '入库数量';
+                           					}
+                           				})
+                           				
                            			}
                            		},
                 			},'入')
