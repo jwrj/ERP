@@ -1,0 +1,85 @@
+
+		formatData(){
+			let ajaxData = {};
+
+
+
+			//先拿到所有字段和值----------------------------------------------------
+			let itemArr = ajaxData.data.dataList.data;//原始的物品数组
+			this.data1 = itemArr;
+			// console.log(itemArr);
+			
+			let allFields = [];//去掉无关字段后的原始物品数组
+			for(let i=0;i<itemArr.length;i++){
+				let item = itemArr[i].dataPage_show;//item=一项物品
+				for(let p=0;p<item.formData.length;p++){
+					let ff = item.formData[p].formFields;//ff=物品的一个表单的字段数组
+					for(let t=0;t<ff.length;t++){
+						allFields.push({
+							hid:itemArr[i].id,
+							id:ff[t].id,
+							label:ff[t].label,
+							value:ff[t].value,
+						});
+					}
+				}
+			}
+
+			//对数组进行去重
+			let finalArr = [];//finalArr是去重后的数组
+			for(let i=0;i<allFields.length;i++){
+				let fined = false;
+				for(let p=0;p<finalArr.length;p++){
+					if(finalArr[p].label==allFields[i].label){
+						fined = true;
+						break;
+					}
+				}
+				if(!fined){
+					finalArr.push(allFields[i]);
+				}
+			}
+
+			//-------------------------------------------
+			//动态产生表头
+			for(let i=0;i<finalArr.length;i++){
+				let h = {
+					title:finalArr[i].label,
+					key:'f'+finalArr[i].id,
+				}
+				// this.columns1.push(h);
+				this.columns1.splice(  this.columns1.length-3 , 0, h );
+			}
+
+			//重新加入数据
+			for(let i=0;i<this.data1.length;i++){//重复执行给data1插入新数据
+				let d = this.data1[i];
+				
+					
+				for(let p=0;p<allFields.length;p++){//遍历新增的表头
+					let af = allFields[p];
+					if( d.id == af.hid  ){//从allFields找出属于这一行数据的
+						console.log( d.id, af.id );
+						
+						for(let t=0;t<finalArr.length;t++){
+							if( af.label ==finalArr[t].label  ){
+								this.data1[i]['f'+ finalArr[t].id  ] = af.value ;
+							}
+						}
+						
+
+					}
+					/*
+
+					*/
+					
+					// this.data1[i]['f'+ key  ] = allFields[p].value;
+				}
+					 
+
+			}
+
+//=================================================
+
+
+		},

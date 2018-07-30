@@ -551,7 +551,14 @@ export default {
     methods:{
     	
     	init(){//初始化
-				
+			
+    		let arr = {
+    			title: '物品ID',
+                key: 'id',
+    		};
+    		
+    		this.columnsList.splice(  this.columnsList.length-3 , 0, arr );
+			
 			let _this = this;
 			
 			this.columnsList.forEach(item => {//初始化表格内容
@@ -750,8 +757,96 @@ export default {
 				
 			})
 		},
+		
+		//=====================表头显示规格============================
+		
+		formatData( _ajaxData, _columns ){//ajax返回的数组,也是表格主体要遍历的数据, 原始表头 
+
+			//先拿到所有字段和值----------------------------------------------------
+			let itemArr = _ajaxData;//原始的物品数组
+			// console.log(itemArr);
+			
+			let allFields = [];//去掉无关字段后的原始物品数组
+			for(let i=0;i<itemArr.length;i++){
+				let item = itemArr[i].dataPage_show;//item=一项物品
+				for(let p=0;p<item.formData.length;p++){
+					let ff = item.formData[p].formFields;//ff=物品的一个表单的字段数组
+					for(let t=0;t<ff.length;t++){
+						allFields.push({
+							hid:itemArr[i].id,
+							id:ff[t].id,
+							label:ff[t].label,
+							value:ff[t].value,
+						});
+					}
+				}
+			}
+
+			//对数组进行去重
+			let finalArr = [];//finalArr是去重后的数组
+			for(let i=0;i<allFields.length;i++){
+				let fined = false;
+				for(let p=0;p<finalArr.length;p++){
+					if(finalArr[p].label==allFields[i].label){
+						fined = true;
+						break;
+					}
+				}
+				if(!fined){
+					finalArr.push(allFields[i]);
+				}
+			}
+
+			//-------------------------------------------
+			//动态产生表头
+			
+			let bt = [];
+			
+			for(let i=0;i<finalArr.length;i++){
+				let h = {
+					title:finalArr[i].label,
+					key:'f'+finalArr[i].id,
+				}
+				
+				bt.push(h);
+				//_columns.splice(  _columns.length-3 , 0, h );
+			}
+
+			//重新加入数据
+			
+			for(let i=0;i<_ajaxData.length;i++){//重复执行给data1插入新数据
+				let d = _ajaxData[i];
+				
+					
+				for(let p=0;p<allFields.length;p++){//遍历新增的表头
+					let af = allFields[p];
+					if( d.id == af.hid  ){//从allFields找出属于这一行数据的
+						console.log( d.id, af.id );
+						
+						for(let t=0;t<finalArr.length;t++){
+							if( af.label ==finalArr[t].label  ){
+								_ajaxData[i]['f'+ finalArr[t].id  ] = af.value ;
+							}
+						}						
+
+					}
+					
+				}					 
+
+			}
+
+			//=================================================
+
+			return {data: _ajaxData, columns: bt}
+			//用法
+
+//		let newObj = this.formatData(this.ajaxDatas.data.dataList.data , this.columns1 );
+//		this.columns1 =  newObj.columns;//新的表头
+//		this.data1 =  newObj.data;//标体数据
+		},
     	
     	//===================================================
+    	
     	formattedDate(val){//选择日期
     		
     		this.stateInfo.date = val;

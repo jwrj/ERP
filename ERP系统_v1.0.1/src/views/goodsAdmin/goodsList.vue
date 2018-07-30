@@ -275,6 +275,7 @@ export default {
         }
     },
     methods: {//方法
+    	
     	showConfiguration(str){//点击查看配置
     		
     		let where = ["or"];
