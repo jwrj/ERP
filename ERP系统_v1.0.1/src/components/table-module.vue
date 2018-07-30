@@ -23,8 +23,8 @@
 		
 		<!--表格-->
 		<Table
-			:columns="columnsList"
-			:data="tabDataList"
+			:columns="recombinationData ? newColumnsList : columnsList"
+			:data="recombinationData ? newTabelDataList : tabDataList"
 			
 			highlight-row
 			border
@@ -494,6 +494,10 @@ export default {
 			type: Boolean,
 	 		default: false,
 		},
+		recombinationData: {//重组数据
+			type: Boolean,
+	 		default: false,
+		},
 	 	
 	},
 	components:{//模板
@@ -546,18 +550,15 @@ export default {
             
             selectedNum: 0,//已选条数
             
+            newColumnsList: [],
+            
+            newTabelDataList: [],
+            
         }
     },
     methods:{
     	
     	init(){//初始化
-			
-    		let arr = {
-    			title: '物品ID',
-                key: 'id',
-    		};
-    		
-    		this.columnsList.splice(  this.columnsList.length-3 , 0, arr );
 			
 			let _this = this;
 			
@@ -800,16 +801,16 @@ export default {
 			//-------------------------------------------
 			//动态产生表头
 			
-			let bt = [];
+			let newColumns = [];
+			
+			newColumns.push(..._columns);
 			
 			for(let i=0;i<finalArr.length;i++){
 				let h = {
 					title:finalArr[i].label,
 					key:'f'+finalArr[i].id,
 				}
-				
-				bt.push(h);
-				//_columns.splice(  _columns.length-3 , 0, h );
+				newColumns.splice(_columns.length-3 , 0, h );
 			}
 
 			//重新加入数据
@@ -821,7 +822,7 @@ export default {
 				for(let p=0;p<allFields.length;p++){//遍历新增的表头
 					let af = allFields[p];
 					if( d.id == af.hid  ){//从allFields找出属于这一行数据的
-						console.log( d.id, af.id );
+//						console.log( d.id, af.id );
 						
 						for(let t=0;t<finalArr.length;t++){
 							if( af.label ==finalArr[t].label  ){
@@ -837,12 +838,8 @@ export default {
 
 			//=================================================
 
-			return {data: _ajaxData, columns: bt}
-			//用法
+			return {data: _ajaxData, columns: newColumns}
 
-//		let newObj = this.formatData(this.ajaxDatas.data.dataList.data , this.columns1 );
-//		this.columns1 =  newObj.columns;//新的表头
-//		this.data1 =  newObj.data;//标体数据
 		},
     	
     	//===================================================
@@ -1265,6 +1262,12 @@ export default {
 				}
 				
 				this.tabDataList = response.data.dataList.data;//表格数据列表
+				
+				if(this.recombinationData){//重新组合表头数据
+					let newData = this.formatData(response.data.dataList.data,this.columnsList);//重新组合表头数据
+					this.newColumnsList = newData.columns;
+					this.newTabelDataList = newData.data;
+				}
 				
 				let arr = [{
         			label:'全部数据',

@@ -15,6 +15,7 @@
 					seleSeekField="pid_tree_title"
 					:pidTreeClassId="13"
 					:clientSelect="true"
+					:recombinationData="true"
 					
 					tableDataUrl="items/item_list"
 					showUrl="items/item_show"
@@ -157,26 +158,26 @@ export default {
 						return h('span',params.row.extend_data[0].number)
                     }
         		},
-        		{
-        			title: '物品参数',
-                    render: (h, params) => {
-							
-						let str = '';
-						
-						params.row.dataPage_show.formData.forEach(item => {
-							
-							item.formFields.forEach(item2 => {
-								
-								str += item2.label+'：'+item2.value+'，';
-								
-							});
-							
-						});
-						
-						return h('div',str ? str : '- -')
-						
-					},
-        		},
+//      		{
+//      			title: '物品参数',
+//                  render: (h, params) => {
+//							
+//						let str = '';
+//						
+//						params.row.dataPage_show.formData.forEach(item => {
+//							
+//							item.formFields.forEach(item2 => {
+//								
+//								str += item2.label+'：'+item2.value+'，';
+//								
+//							});
+//							
+//						});
+//						
+//						return h('div',str ? str : '- -')
+//						
+//					},
+//      		},
         		{
                 	title: '出入库记录',
                 	align:'center',
