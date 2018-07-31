@@ -100,6 +100,7 @@
 								<!--入库列表显示-->
 								<Table v-if="$route.name == 'warehouseList'" border @on-selection-change="tableChange" :columns="goodsColumns4" :data="item.itemsList"></Table>
 								
+								<!--操作物品-->
 								<div style="margin-top:10px;">
 									
 									<Button type="error" icon="trash-a" size="small" @click="batchDele">批量删除</Button>
@@ -109,7 +110,6 @@
 									<Button type="dashed" icon="plus-round" size="small" @click="modalIo = true">添加物品</Button>
 									
 									<div>
-										
 										<Modal v-model="modalIo" width="500">
 									        <p slot="header">添加物品</p>
 									        <div style="text-align:center">
@@ -137,10 +137,10 @@
 									        	<Button type="primary" @click="addGoods">确认</Button>
 									        </div>
 									    </Modal>
-										
 									</div>
 									
 								</div>
+								
 							</div>
 							
 						</Card>

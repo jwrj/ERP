@@ -59,45 +59,28 @@
 						</Card>
 						
 					</div>
-					<!--其他页面数据-->
 					
 					<!--物品列表-->
 					<Card v-if="item.itemsList && item.itemsList.length > 0" style="margin-top:15px;">
 						
 						<h2 slot="title">物品列表</h2>
 						
-						<!--默认显示-->
-						<div v-if="$route.name != 'billEdit-1' && $route.name != 'delivergoodsList' && $route.name != 'pickingList' && $route.name != 'warehouseList'" style="padding: 15px;">
+						<!--公共-->
+						<div v-if="showTabelType.All" style="padding: 16px;">
 							
-							<Table border :columns="goodsColumns" :data="item.itemsList"></Table>
-							
-						</div>
-						
-						<!--发货单显示-->
-						<div v-if="$route.name == 'delivergoodsList'" style="padding: 15px;">
-							
-							<Table border :columns="goodsColumns3" :data="item.itemsList"></Table>
-							
-						</div>
-						
-						<!--领料单显示-->
-						<div v-if="$route.name == 'pickingList'" style="padding: 15px;">
-							
-							<Table border :columns="goodsColumns4" :data="item.itemsList"></Table>
-							
-						</div>
-						
-						<!--入库显示-->
-						<div v-if="$route.name == 'warehouseList'" style="padding: 15px;">
-							
-							<Table border :columns="goodsColumns5" :data="item.itemsList"></Table>
+							<Table
+							border
+							:columns="showTabelType.columnsList"
+							:data="item.itemsList"
+							>
+							</Table>
 							
 						</div>
 						
 						<!--财务显示-->
-						<div v-if="$route.name == 'billEdit-1'" style="padding: 15px;">
+						<div v-if="showTabelType.C" style="padding: 15px;">
 							
-							<Table border :columns="goodsColumns2" :data="item.itemsList" @on-selection-change="tableChange"></Table>
+							<Table border :columns="showTabelType.columnsList" :data="item.itemsList" @on-selection-change="tableChange"></Table>
 							
 							<h2 style="position:relative;text-align:center;padding:10px;margin-top:-1px;border:1px solid #dddee1;">
 								<Spin size="small" fix v-if="loading.spinShow"></Spin>
@@ -112,7 +95,6 @@
 						</div>
 						
 					</Card>
-					<!--物品列表-->
 					
 					<!--附加表单数据-->
 					<div v-for="main in item.title" style="margin-top:15px;">
@@ -143,7 +125,6 @@
 						</Card>
 							
 					</div>
-					<!--附加表单数据-->
 				
 				</div>
 				
@@ -193,191 +174,36 @@
 				
 				sumPriceIo: false,//显示
 				
-				//==================默认数据======================
-				goodsColumns: [//物品表头数据
+				columnsAll: [//公共数据
 					{
-						width: 100,
+						width:70,
 						align: 'center',
+						fixed: 'left',
 						title: 'ID',
 						key: 'id',
 					},
 					{
-						width: 100,
+						width:80,
 						align: 'center',
+						fixed: 'left',
 						title: '物品ID',
 						key: 'item_id',
 					},
 					{
+						minWidth:160,
+	        			ellipsis: true,
+	        			fixed: 'left',
 						title: '物品名称',
 						render: (h, params) => {
 							return h('span',params.row.item_info.name)
 						},
 					},
 					{
-						width: 160,
-						align: 'center',
+						width: 100,
+						fixed: 'left',
 						title: '需求数量',
 						key: 'number',
-					},
-					{
-						title: '物品参数',
-						render: (h, params) => {
-							
-							let str = '';
-							
-							params.row.item_info.formData.forEach(item => {
-								
-								item.formFields.forEach(item2 => {
-									
-									str += item2.label+'：'+item2.value+'，';
-									
-								});
-								
-							});
-							
-							return h('div',str)
-						},
-					},
-				],
-				
-				//==================发货单数据======================
-				goodsColumns3: [//物品表头数据
-					{
-						width: 100,
-						align: 'center',
-						title: 'ID',
-						key: 'id',
-					},
-					{
-						width: 100,
-						align: 'center',
-						title: '物品ID',
-						key: 'item_id',
-					},
-					{
-						title: '物品名称',
-						render: (h, params) => {
-							return h('span',params.row.item_info.name)
-						},
-					},
-					{
-						width: 160,
-						align: 'center',
-						title: '发货数量',
-						key: 'number',
-					},
-					{
-						title: '物品参数',
-						render: (h, params) => {
-							
-							let str = '';
-							
-							params.row.item_info.formData.forEach(item => {
-								
-								item.formFields.forEach(item2 => {
-									
-									str += item2.label+'：'+item2.value+'，';
-									
-								});
-								
-							});
-							
-							return h('div',str)
-						},
-					},
-				],
-				
-				//==================发货单数据======================
-				goodsColumns4: [//物品表头数据
-					{
-						width: 100,
-						align: 'center',
-						title: 'ID',
-						key: 'id',
-					},
-					{
-						width: 100,
-						align: 'center',
-						title: '物品ID',
-						key: 'item_id',
-					},
-					{
-						title: '物品名称',
-						render: (h, params) => {
-							return h('span',params.row.item_info.name)
-						},
-					},
-					{
-						width: 160,
-						align: 'center',
-						title: '领料数量',
-						key: 'number',
-					},
-					{
-						title: '物品参数',
-						render: (h, params) => {
-							
-							let str = '';
-							
-							params.row.item_info.formData.forEach(item => {
-								
-								item.formFields.forEach(item2 => {
-									
-									str += item2.label+'：'+item2.value+'，';
-									
-								});
-								
-							});
-							
-							return h('div',str)
-						},
-					},
-				],
-				
-				//==================入库列表数据======================
-				goodsColumns5: [//物品表头数据
-					{
-						width: 100,
-						align: 'center',
-						title: 'ID',
-						key: 'id',
-					},
-					{
-						width: 100,
-						align: 'center',
-						title: '物品ID',
-						key: 'item_id',
-					},
-					{
-						title: '物品名称',
-						render: (h, params) => {
-							return h('span',params.row.item_info.name)
-						},
-					},
-					{
-						width: 160,
-						align: 'center',
-						title: '入库数量',
-						key: 'number',
-					},
-					{
-						title: '物品参数',
-						render: (h, params) => {
-							
-							let str = '';
-							
-							params.row.item_info.formData.forEach(item => {
-								
-								item.formFields.forEach(item2 => {
-									
-									str += item2.label+'：'+item2.value+'，';
-									
-								});
-								
-							});
-							
-							return h('div',str)
-						},
+						differ: true,
 					},
 				],
 				
@@ -387,39 +213,45 @@
 				
 				modificationList: [],//表格修改列表
 				
-				goodsColumns2: [//物品表头数据
+				financeColumns: [//物品表头数据
 					{
                         type: 'selection',
                         width: 60,
-                        align: 'center'
+                        fixed: 'left',
+                        align: 'center',
                     },
 					{
-						width: 100,
+						width:70,
 						align: 'center',
+						fixed: 'left',
 						title: 'ID',
 						key: 'id',
 					},
 					{
-						width: 100,
+						width:80,
 						align: 'center',
+						fixed: 'left',
 						title: '物品ID',
 						key: 'item_id',
 					},
 					{
+						minWidth:160,
+	        			ellipsis: true,
+	        			fixed: 'left',
 						title: '物品名称',
 						render: (h, params) => {
 							return h('span',params.row.item_info.name)
 						},
 					},
 					{
-						width: 160,
-						align: 'center',
+						width: 100,
 						title: '需求数量',
+						fixed: 'left',
 						key: 'number',
 					},
 					{
-						width: 160,
-						align: 'center',
+						width: 120,
+						fixed: 'left',
 						title: '单价(元)',
 						render: (h, params) => {
 							
@@ -452,7 +284,8 @@
 						}
 					},
 					{
-						align: 'center',
+						width: 120,
+						fixed: 'left',
 						title: '小计(元)',
 						render: (h, params) => {
 							
@@ -481,30 +314,12 @@
 							return h('span',sum.toFixed(2))
 						},
 					},
-					{
-						title: '物品参数',
-						render: (h, params) => {
-							
-							let str = '';
-							
-							params.row.item_info.formData.forEach(item => {
-								
-								item.formFields.forEach(item2 => {
-									
-									str += item2.label+'：'+item2.value+'，';
-									
-								});
-								
-							});
-							
-							return h('div',str)
-						},
-					},
 				],
 				
 			}
 		},
 		methods: {
+			
 			getTitleList(id){//获取数据
 				
 				this.loading.pageLoad = true;
@@ -662,9 +477,170 @@
 	       		}
 	       		
 	       	},
+	       	
+	       	//=====================表头显示规格============================
+		
+			formatData( _ajaxData, _columns, place = +0 ){//_ajaxData:ajax返回的数组,也是表格主体要遍历的数据, _columns:原始表头 ,place:插入位置，默认位置为未尾部（从元素后面倒数插入）
+	
+				//先拿到所有字段和值----------------------------------------------------
+				let itemArr = _ajaxData;//原始的物品数组
+				// console.log(itemArr);
+				
+				let allFields = [];//去掉无关字段后的原始物品数组
+				for(let i=0;i<itemArr.length;i++){
+					let item = itemArr[i].item_info;//item=一项物品
+					for(let p=0;p<item.formData.length;p++){
+						let ff = item.formData[p].formFields;//ff=物品的一个表单的字段数组
+						for(let t=0;t<ff.length;t++){
+							allFields.push({
+								hid:itemArr[i].id,
+								id:ff[t].id,
+								label:ff[t].label,
+								value:ff[t].value,
+							});
+						}
+					}
+				}
+	
+				//对数组进行去重
+				let finalArr = [];//finalArr是去重后的数组
+				for(let i=0;i<allFields.length;i++){
+					let fined = false;
+					for(let p=0;p<finalArr.length;p++){
+						if(finalArr[p].label==allFields[i].label){
+							fined = true;
+							break;
+						}
+					}
+					if(!fined){
+						finalArr.push(allFields[i]);
+					}
+					
+				}
+	
+				//-------------------------------------------
+				//动态产生表头
+				
+				let newColumns = [];
+				
+				newColumns.push(..._columns);
+				
+				for(let i=0;i<finalArr.length;i++){
+					let h = {
+						minWidth: 140,
+						title:finalArr[i].label,
+						key:'f'+finalArr[i].id,
+					}
+					newColumns.splice(_columns.length-(place) , 0, h );
+				}
+	
+				//重新加入数据
+				
+				for(let i=0;i<_ajaxData.length;i++){//重复执行给data1插入新数据
+					
+					let d = _ajaxData[i];
+					
+					finalArr.forEach(item => {
+						_ajaxData[i]['f'+ item.id ] = '- -';
+					});
+					
+					for(let p=0;p<allFields.length;p++){//遍历新增的表头
+						let af = allFields[p];
+						if( d.id == af.hid  ){//从allFields找出属于这一行数据的
+							
+							for(let t=0;t<finalArr.length;t++){
+								if( af.label == finalArr[t].label  ){
+									_ajaxData[i]['f'+ finalArr[t].id  ] = af.value || '- -';
+								}
+							}					
+	
+						}
+						
+					}					 
+	
+				}
+	
+				//=================================================
+	
+				return {data: _ajaxData, columns: newColumns}
+	
+			},
 			
 		},
 		computed:{//计算属性
+			
+			showTabelType(){
+				
+				let _columnsList = [];
+				
+				let _tabelList = [];
+				
+				let title = '';
+				
+				let [_All,_C] = [false,false];
+				
+				let def = (this.$route.name != 'billEdit-1')
+						&& (this.$route.name != 'delivergoodsList') 
+						&& (this.$route.name != 'pickingList') 
+						&& (this.$route.name != 'warehouseList');
+				
+				if(def){//默认显示
+					
+					_All = true;
+					
+					title = '需求数量';
+					
+				}else if(this.$route.name == 'delivergoodsList'){//发货单显示
+					
+					_All = true;
+					
+					title = '发货数量';
+					
+				}else if(this.$route.name == 'pickingList'){//领料单显示
+					
+					_All = true;
+					
+					title = '领料数量';
+					
+				}else if(this.$route.name == 'warehouseList'){//入库显示
+					
+					_All = true;
+					
+					title = '入库数量';
+					
+				}else if(this.$route.name == 'billEdit-1'){//财务显示
+					
+					_C = true;
+					
+					let newData = this.formatData( this.dataList[0].itemsList, this.financeColumns );
+					
+					_columnsList = newData.columns;
+					
+					_tabelList = newData.data;
+					
+				}else{
+					
+				}
+				
+				if(!_C){//公共的
+					
+					this.columnsAll.forEach(item => {
+						if(item.differ){
+							item.title = title;
+						}
+					});
+					
+					let newData = this.formatData( this.dataList[0].itemsList, this.columnsAll );
+					
+					_columnsList = newData.columns;
+					
+					_tabelList = newData.data;
+					
+				}
+				
+				return { All: _All, C: _C, columnsList: _columnsList, tabelList: _tabelList };
+				
+			},
 			
     	},
 		mounted(){//模板被渲染完毕之后执行

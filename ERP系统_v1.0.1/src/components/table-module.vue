@@ -761,7 +761,7 @@ export default {
 		
 		//=====================表头显示规格============================
 		
-		formatData( _ajaxData, _columns ){//ajax返回的数组,也是表格主体要遍历的数据, 原始表头 
+		formatData( _ajaxData, _columns, place = +0 ){//_ajaxData:ajax返回的数组,也是表格主体要遍历的数据, _columns:原始表头 ,place:插入位置，默认位置为未尾部（从元素后面倒数插入）
 
 			//先拿到所有字段和值----------------------------------------------------
 			let itemArr = _ajaxData;//原始的物品数组
@@ -796,6 +796,7 @@ export default {
 				if(!fined){
 					finalArr.push(allFields[i]);
 				}
+				
 			}
 
 			//-------------------------------------------
@@ -807,28 +808,32 @@ export default {
 			
 			for(let i=0;i<finalArr.length;i++){
 				let h = {
+					minWidth: 140,
 					title:finalArr[i].label,
 					key:'f'+finalArr[i].id,
 				}
-				newColumns.splice(_columns.length-3 , 0, h );
+				newColumns.splice(_columns.length-(place) , 0, h );
 			}
 
 			//重新加入数据
 			
 			for(let i=0;i<_ajaxData.length;i++){//重复执行给data1插入新数据
+				
 				let d = _ajaxData[i];
 				
-					
+				finalArr.forEach(item => {
+					_ajaxData[i]['f'+ item.id ] = '- -';
+				});
+				
 				for(let p=0;p<allFields.length;p++){//遍历新增的表头
 					let af = allFields[p];
 					if( d.id == af.hid  ){//从allFields找出属于这一行数据的
-//						console.log( d.id, af.id );
 						
 						for(let t=0;t<finalArr.length;t++){
-							if( af.label ==finalArr[t].label  ){
-								_ajaxData[i]['f'+ finalArr[t].id  ] = af.value ;
+							if( af.label == finalArr[t].label  ){
+								_ajaxData[i]['f'+ finalArr[t].id  ] = af.value || '- -';
 							}
-						}						
+						}					
 
 					}
 					
@@ -1267,6 +1272,7 @@ export default {
 					let newData = this.formatData(response.data.dataList.data,this.columnsList);//重新组合表头数据
 					this.newColumnsList = newData.columns;
 					this.newTabelDataList = newData.data;
+					console.log(response.data.dataList.data);
 				}
 				
 				let arr = [{
@@ -1444,7 +1450,7 @@ export default {
 
 <style>
 	.table-box .ivu-table-body{
-		overflow:initial;
+		/*overflow:initial;*/
 	}
 	.seekBox i{
 		cursor: pointer;

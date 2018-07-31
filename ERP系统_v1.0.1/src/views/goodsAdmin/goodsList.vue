@@ -125,16 +125,20 @@ export default {
         		{
         			align:'center',
         			width:70,
+        			fixed: 'left',
         			title: 'ID',
                     key: 'id',
         		},
         		{
+        			minWidth:160,
+        			ellipsis: true,
+        			fixed: 'left',
         			title: '物品名称',
                     key: 'name',
         		},
         		{
-        			align:'center',
         			width:100,
+        			fixed: 'left',
         			title: '客户库存',
                     render: (h, params) => {
                     	
@@ -151,36 +155,17 @@ export default {
                     }
         		},
         		{
-        			align:'center',
         			width:100,
+        			fixed: 'left',
         			title: '总库存',
                     render: (h, params) => {
 						return h('span',params.row.extend_data[0].number)
                     }
         		},
-//      		{
-//      			title: '物品参数',
-//                  render: (h, params) => {
-//							
-//						let str = '';
-//						
-//						params.row.dataPage_show.formData.forEach(item => {
-//							
-//							item.formFields.forEach(item2 => {
-//								
-//								str += item2.label+'：'+item2.value+'，';
-//								
-//							});
-//							
-//						});
-//						
-//						return h('div',str ? str : '- -')
-//						
-//					},
-//      		},
         		{
                 	title: '出入库记录',
                 	align:'center',
+                	fixed: 'right',
                 	width:100,
                 	render: (h, params) => {
                 		
@@ -238,6 +223,7 @@ export default {
         		{
                 	title: '配件',
                 	align:'center',
+                	fixed: 'right',
                 	width:100,
                 	render: (h, params) => {
                 		
@@ -269,6 +255,7 @@ export default {
                 	title: '操作',
                 	align:'center',
                 	width:120,
+                	fixed: 'right',
                 	handle:['edit2','delete'],
                 },
         	],

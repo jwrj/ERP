@@ -72,6 +72,7 @@
 					:columns-list="columns"
 					:pidTreeClassId="13"
 					stateListId="13"
+					:recombinationData="true"
 					
 					tableDataUrl="items/item_list"
 					seleSeekField="pid_tree_title"
@@ -104,44 +105,30 @@ export default {
         		{
                     type: 'selection',
                     width: 60,
-                    align: 'center'
+                    align: 'center',
+                    fixed: 'left',
                 },
         		{
         			align:'center',
         			width:70,
+        			fixed: 'left',
         			title: 'ID',
                     key: 'id',
         		},
         		{
+        			minWidth:160,
+        			ellipsis: true,
+        			fixed: 'left',
         			title: '物品名称',
                     key: 'name',
         		},
         		{
-        			align:'center',
-        			width:80,
-        			title: '库存数',
+        			width:100,
+        			fixed: 'left',
+        			title: '总库存',
                     render: (h, params) => {
 						return h('span',params.row.extend_data[0].number)
                     }
-        		},
-        		{
-        			title: '物品参数',
-                    render: (h, params) => {
-							
-						let str = '';
-						
-						params.row.dataPage_show.formData.forEach(item => {
-							
-							item.formFields.forEach(item2 => {
-								
-								str += item2.label+'：'+item2.value+'，';
-								
-							});
-							
-						});
-						
-						return h('div',str)
-					},
         		},
         	],
         	

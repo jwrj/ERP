@@ -31,18 +31,47 @@
 			
         	<Col :xs="24" :sm="24" :md="13" :lg="16">
         		<Card id="Card2">
-        			<p>12323213</p>
-        			<p>12323213</p>
-        			<p>12323213</p>
-        			<p>12323213</p>
-        			<p>12323213</p>
-        			<p>12323213</p>
+        			
+        			<h1 slot="title">系统使用说明</h1>
+        			
+        			<div style="padding: 16px;">
+        				<p>需要使用高版本浏览器运行该系统。</p>
+        				<p>如：谷歌浏览器、火狐浏览器等。</p>
+        			</div>
+        			
 				</Card>
         	</Col>
         	
         	<Col span="24">
         		<Card id="Card3">
-					<p>系统使用说明</p>
+        			
+        			<h1 slot="title">更新日志</h1>
+        			
+        			<div style="padding: 16px;">
+        				
+        				<Timeline class="Timeline">
+        					
+					        <TimelineItem>
+					            <Icon type="trophy" slot="dot"></Icon>
+					            <span class="title">v1.0.2</span>
+					            <p class="content">
+					            	<Icon type="ios-star-outline"></Icon>
+					            	物品表加入了规格表头显示的功能。
+					            </p>
+					        </TimelineItem>
+					        
+					        <TimelineItem>
+					        	<span class="title">v1.0.1</span>
+					        	<p class="content">
+					        		<Icon type="ios-star-outline"></Icon>
+					        		优化UI，增加皮肤功能。
+					        	</p>
+					        </TimelineItem>
+					        
+					    </Timeline>
+        				
+        			</div>
+        			
 				</Card>
         	</Col>
         	
@@ -134,10 +163,24 @@
 		}
 	}
 	#Card2{
-		.Public(100%);
+		.Public(100%,0,0,0);
 		max-height: 216px;
 	}
 	#Card3{
-		.Public;
+		.Public(auto,0,0,0);
+	}
+	.Timeline{
+		.title{
+			font-weight: bold;
+		}
+		.content{
+			padding: 8px 0 8px 10px;
+			line-height: 20px;
+			font-size: 14px;
+			i{
+				font-size: 12px;
+				margin-right: 8px;
+			}
+		}
 	}
 </style>
