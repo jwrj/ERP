@@ -11,7 +11,7 @@
             			
             			<div>
             				<span>ERP系统</span>
-            				<sup style="font-size: 14px;">v1.0.1</sup>
+            				<sup style="font-size: 14px;">v1.0.2</sup>
             			</div>
             			
             		</div>
