@@ -11,7 +11,7 @@
             			
             			<div>
             				<span>ERP系统</span>
-            				<sup style="font-size: 14px;">v1.0.2</sup>
+            				<!--<sup style="font-size: 14px;">v1.0.2</sup>-->
             			</div>
             			
             		</div>
@@ -704,7 +704,7 @@
 	.Content{
 		width:100%;
 		background:#f8f8f9;
-		padding:15px;
+		padding:26px 16px 200px;
 		position: absolute;
 		top:0;
 		bottom:0;

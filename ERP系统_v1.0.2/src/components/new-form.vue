@@ -5,13 +5,18 @@
     	<Card>
     		
     		<div slot="title" style="display: flex;align-items: center;justify-content: space-between;">
-    			<h1>{{titleName}}</h1>
-    			<div>
-    				<span style="margin-right:6px;font-size:12px;">选择模板</span>
-    				<Select ref="seleInstance" v-model="defaultTem" filterable placeholder="无数据" @on-change="template" style="width:150px">
+    			
+    			<h1 style="flex-shrink: 0;">{{titleName}}</h1>
+    			
+    			<div style="display: flex;align-items: center;">
+    				
+    				<span style="flex-shrink:0;margin-right:6px;font-size:12px;">选择模板</span>
+    				
+    				<Select ref="seleInstance" v-model="defaultTem" filterable placeholder="无数据" @on-change="template" style="max-width:200px">
     			        <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
     			    </Select>
-    			    <div style="display: inline-block;">
+    			    
+    			    <div style="margin-left:8px;">
     			    	<cpm-mod
     			    		@upPageData="upPage"
     			    		titleName="模板管理"
@@ -22,31 +27,42 @@
 				    	>
     			    	</cpm-mod>
     			    </div>
+    			    
     			</div>
+    			
     		</div>
+    		
+    		<slot></slot>
     		
     		<div style="position: relative;">
     			
     			<Spin fix v-show="pageLoad"></Spin>
     			
-	    		<div style="padding:15px 15px 0;">
-	    			
-				    <div v-for="item in titleList">
-					    <Card style="margin-bottom:15px;">
-					    	<h1 slot="title">{{item.name}}</h1>
-					    	<form-mod ref="modInstance" @increment="formEvent" :pid="item.id" :form-data="item.formFields"></form-mod>
+			    <div v-for="item in titleList">
+			    	
+				    <Card :bordered="false" dis-hover style="margin: 16px 0 0 30px;">
+				    	
+				    	<h2 slot="title">{{item.name}}</h2>
+				    	
+				    	<form-mod ref="modInstance" @increment="formEvent" :pid="item.id" :form-data="item.formFields"></form-mod>
+				    	
+				    	<template v-for="item2 in item.children" v-if="true">
+				    		
+					    	<Card :bordered="false" dis-hover style="margin: 0 0 0 30px;">
+					    		
+						    	<h2 slot="title">{{item2.name}}</h2>
+						    	
+					    		<form-mod ref="modInstance" @increment="formEvent" :pid="item2.id" :form-data="item2.formFields"></form-mod>
+					    		
+					    	</Card>
 					    	
-					    	<template v-for="item2 in item.children" v-if="true">
-						    	<Card :bordered="false" dis-hover>
-							    	<h2 slot="title" class="h2">{{item2.name}}</h2>
-						    		<form-mod ref="modInstance" @increment="formEvent" :pid="item2.id" :form-data="item2.formFields"></form-mod>
-						    	</Card>
-					    	</template>
-					    </Card>
-				    </div>
+				    	</template>
+				    	
+				    </Card>
+				    
 			    </div>
-			    
-			    <div style="text-align: center;padding:40px 15px 15px;border-top:1px solid #e9eaec;">
+				    
+			    <div style="text-align: center;padding:30px 0;">
 			    	<Button type="primary" @click="submit">{{buttonName}}</Button>
 			    </div>
 			    

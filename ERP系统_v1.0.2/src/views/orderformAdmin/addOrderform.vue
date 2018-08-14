@@ -1,19 +1,22 @@
 <template>
+	
 	<div>
 		
 		<Card>
 			
-			<div style="padding:24px 0 0;">
+			<h1 slot="title">订单基本信息填写</h1>
+			
+			<div style="padding:24px 0 1px;">
 				
-				<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="80">
+				<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="90">
 					
 			        <FormItem label="订单名称" prop="name">
-			            <Input v-model="formItem.name" clearable style="width: 160px;" placeholder="请输入订单名称"></Input>
+			            <Input v-model="formItem.name" clearable style="max-width: 200px;" placeholder="请输入订单名称"></Input>
 			        </FormItem>
 			        
 			        <FormItem label="选择客户" prop="clientModel">
 			        	
-			            <Select v-model="formItem.clientModel" filterable placeholder="无数据" style="width:150px" @on-change="clientSele">
+			            <Select v-model="formItem.clientModel" filterable placeholder="无数据" style="max-width:260px" @on-change="clientSele">
 					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 					    </Select>
 					    
@@ -31,17 +34,17 @@
 			
 		</Card>
 		
-    	<Card style="margin-top:15px;" v-if="clientList.length > 0">
+    	<Card style="margin-top:16px;" v-if="clientList.length > 0">
     		
     		<h1 slot="title">订单客户</h1>
-    			
-    		<div style="padding:15px;">
+    		
+    		<div>
 	    		<form-view ref="viewInstance"></form-view>
     		</div>
     		
     	</Card>
     	
-    	<Card style="margin-top:15px;" v-if="addressIo">
+    	<Card style="margin-top:16px;" v-if="addressIo">
     		
     		<div slot="title" style="display:flex;align-items: center;">
     			
@@ -60,26 +63,26 @@
     			
     		</div>
     		
-    		<div style="padding:15px;" v-if="addressList.length > 0">
+    		<div v-if="addressList.length > 0">
 	    		<form-view ref="viewInstance2"></form-view>
     		</div>
     		
     	</Card>
     	
-    	<Card style="margin-top:15px;">
+    	<Card style="margin-top:16px;">
     		
     		<h1 slot="title">订单物品</h1>
     		
-	    	<div style="padding:16px;">
+	    	<div style="padding:0 16px 16px;">
 				
-	        	<Card>
+	        	<Card dis-hover :bordered="false">
 	        		
-	        		<div slot="title" style="display:flex;justify-content: space-between;align-items: center;">
-	        			<h2>订单需求物品列表</h2>
+	        		<div style="margin-top:16px;padding: 14px 0 14px 30px;display:flex;align-items: center;">
+	        			<p style="margin-right: 16px;">已选物品列表</p>
 	        			<Button type="primary" size="small" @click="modalShow = true">打开物品列表</Button>
 	        		</div>
 	        		
-	        		<div style="padding:16px;">
+	        		<div>
 	        			<Form class="tableFormInstance" ref="formInstance" :model="purchaseGoods" :show-message="false">
 	        				<Table border :columns="goodsColumns" :data="purchaseGoods.data"></Table>
 	        			</Form>
@@ -91,7 +94,19 @@
 			
 		</Card>
     	
-    	<!--弹窗选数据-->
+    	<div style="margin-top:16px;">
+    		<new-form
+    			ref="newFormInstance"
+    			:pid-tree-class="4"
+    			:pageId="22"
+				titleName="订单附加信息"
+				buttonName="新增订单"
+				submitUrl="orders/order_add"
+    		>
+    		</new-form>
+    	</div>
+	    	
+	    <!--弹窗选数据-->
 		<Modal v-model="modalShow" width="80%">
 	        <p slot="header">物品列表</p>
 	        <div>
@@ -115,18 +130,6 @@
 	        </div>
 	    </Modal>
 	    <!--弹窗选数据-->
-    	
-    	<div style="margin-top:15px;">
-    		<new-form
-    			ref="newFormInstance"
-    			:pid-tree-class="4"
-    			:pageId="22"
-				titleName="订单附加信息"
-				buttonName="新增订单"
-				submitUrl="orders/order_add"
-    		>
-    		</new-form>
-    	</div>
 	    
 	    <Modal v-model="modalShow2" width="80%">
 	    	
@@ -141,6 +144,7 @@
 	    </Modal>
 	    
 	</div>
+	
 </template>
 
 <script>

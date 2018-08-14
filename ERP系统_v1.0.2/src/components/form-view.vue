@@ -4,44 +4,39 @@
 		
 		<Spin fix v-show="loading.pageLoad"></Spin>
 		
-		<div v-for="item in dataList">
+		<div v-for="item in dataList" style="margin: 16px 0 0 30px;">
 			
-			<Card>
+			<Card :bordered="false" dis-hover>
 				
 				<div slot="title">
-					
 					<h1>{{item.name}}</h1>
-					
 				</div>
 				
-				<div style="padding:0 15px 15px 15px;">
+				<div>
 				
 					<!--其他页面数据-->
 					<div v-for="client in item.usDataPageList" style="margin-top:15px;">
 						
-						<Card>
+						<Card :bordered="false" dis-hover>
 							
 							<div slot="title">
-								
 								<h2>{{client.name}}</h2>
-								
 							</div>
 							
 							<div v-for="main in client.formData" style="margin:15px;">
 								
-								<Card>
+								<Card :bordered="false" dis-hover>
 									
 									<div slot="title">
-										
 										<h2>{{main.name}}</h2>
-										
 									</div>
 									
 									<form-mod :readOnly="true" :pid="Number(main.id)" :form-data="main.formFields"></form-mod>
 									
 									<div v-for="children in main.children" style="padding: 15px;">
 										
-										<Card>
+										<Card dis-hover :bordered="false">
+											
 											<div slot="title">
 												<h3>{{children.name}}</h3>
 											</div>
@@ -97,21 +92,20 @@
 					</Card>
 					
 					<!--附加表单数据-->
-					<div v-for="main in item.title" style="margin-top:15px;">
+					<div v-for="main in item.title" style="margin: 16px 0 0 30px;">
 						
-						<Card>
+						<Card :bordered="false" dis-hover>
 							
 							<div slot="title">
-								
 								<h2>{{main.name}}</h2>
-								
 							</div>
 							
 							<form-mod :readOnly="true" :pid="Number(main.id)" :form-data="main.formFields"></form-mod>
 							
-							<div v-for="children in main.children" style="padding: 15px;">
+							<div v-for="children in main.children" style="margin: 0 0 0 30px;">
 								
-								<Card>
+								<Card dis-hover :bordered="false">
+									
 									<div slot="title">
 										<h3>{{children.name}}</h3>
 									</div>

@@ -10,7 +10,7 @@
 					
 					<Col :span="obj.lw">
 						
-						<p v-if="readOnly" style="padding:10px 0 10px;text-align: right;font-weight: bold;">{{obj.label}}：</p>
+						<p v-if="readOnly" style="padding:10px 0 10px;text-align: right;">{{obj.label}}：</p>
 						
 						<FormItem v-if="!readOnly" :prop="'data.' + index + '.label'" :rules="labelValidate">
 							<div class="col">
@@ -22,7 +22,7 @@
 					
 					<Col :span="obj.rw">
 						
-						<p v-if="readOnly" style="padding:10px;">{{obj.value}}</p>
+						<p v-if="readOnly" style="padding:10px;color: #495060;">{{obj.value}}</p>
 						
 						<FormItem v-if="!readOnly" :prop="'data.' + index + '.value'">
 							<div class="col col-2">

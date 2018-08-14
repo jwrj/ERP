@@ -2,20 +2,6 @@
 
 	<div>
 		
-		<Card style="margin-bottom:2px;">
-			<div style="padding:24px 16px 0;">
-				
-    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="70" inline>
-    				
-			        <FormItem label="地址名称" prop="name">
-			            <Input v-model="formItem.name" style="width: 160px;" placeholder="请输入名称"></Input>
-			        </FormItem>
-			        
-				</Form>
-				
-			</div>
-		</Card>
-		
 		<new-form
 			:pid-tree-class="6"
 			:pageId="27"
@@ -23,6 +9,19 @@
 			buttonName="新增地址"
 			@submitChange="submitChange"
 		>
+		
+			<div style="padding:16px 0 0;border-bottom: 1px solid #e8eaec;">
+				
+    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="100" inline>
+    				
+			        <FormItem label="地址名称" prop="name">
+			            <Input v-model="formItem.name" style="width: 200px;" placeholder="请输入名称"></Input>
+			        </FormItem>
+			        
+				</Form>
+				
+			</div>
+		
 		</new-form>
 		
 		<Card style="margin-top:16px;">

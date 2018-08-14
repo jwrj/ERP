@@ -2,27 +2,25 @@
 
 	<div>
 		
-		<Card style="margin-bottom:2px;">
-			<div style="padding:24px 0 0;">
+		<new-form
+			:pid-tree-class="5"
+			:pageId="2"
+			titleName="新增客户"
+			buttonName="新增客户"
+			@submitChange="submitChange"
+		>
+			<div style="padding:16px 0 0;border-bottom: 1px solid #e8eaec;">
 				
-    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="80" inline>
+    			<Form ref="formItem" :model="formItem" :rules="ruleItem" label-position="right" :label-width="100" inline>
     				
 			        <FormItem label="客户名称" prop="name">
-			            <Input v-model="formItem.name" style="width: 160px;" placeholder="请输入客户名称"></Input>
+			            <Input v-model="formItem.name" placeholder="输入客户名称" style="width: 300px;"></Input>
 			        </FormItem>
 			        
 				</Form>
 				
 			</div>
-		</Card>
-		
-		<new-form
-			:pid-tree-class="5"
-			:pageId="2"
-			titleName="客户信息表单"
-			buttonName="新增客户"
-			@submitChange="submitChange"
-		>
+			
 		</new-form>
 		
 		<Card style="margin-top:16px;">

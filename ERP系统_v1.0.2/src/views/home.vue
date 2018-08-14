@@ -3,7 +3,7 @@
 	<div>
 		<Row :gutter="16" type="flex">
 			
-			<Col :xs="24" :sm="24" :md="11" :lg="8">
+			<Col :xs="24" :sm="24" :md="11" :lg="8" style="margin-bottom: 16px;">
 				
 				<Card id="Card1">
 
@@ -29,7 +29,7 @@
 				
 			</Col>
 			
-        	<Col :xs="24" :sm="24" :md="13" :lg="16">
+        	<Col :xs="24" :sm="24" :md="13" :lg="16" style="margin-bottom: 16px;">
         		<Card id="Card2">
         			
         			<h1 slot="title">系统使用说明</h1>
@@ -130,7 +130,6 @@
 
 	.Public (@height: auto, @pT: 16px, @pLR: 16px, @pB: 16px) {
 		height: @height;
-		margin-bottom: 16px;
 		padding:@pT @pLR @pB;
 		box-sizing: border-box;
 	}
