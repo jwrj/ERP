@@ -180,10 +180,6 @@ export default {
 	},
     mounted(){//模板被渲染完毕之后执行
     	
-    	window.addEvent("paste",function(e){
-    		console.log(e);
-    	});
-    	
 	},
     watch:{//监测数据变化
 		
