@@ -92,8 +92,10 @@
 		>
 		</new-form>
 		
+		<!--批量添加物品组件-->
 		<batch-add-goods @submitSucceed="submitChange" v-if="addType == 1" style="margin-top:2px;"></batch-add-goods>
 		
+		<!--物品列表-->
 		<goods-list ref="goodsInstance" style="margin-top:16px;"></goods-list>
 		
 		

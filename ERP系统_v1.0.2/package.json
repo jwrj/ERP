@@ -10,8 +10,10 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@handsontable/vue": "^2.0.0",
     "axios": "^0.17.1",
     "element-ui": "^2.0.7",
+    "handsontable": "^5.0.1",
     "iview": "^2.13.1",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
