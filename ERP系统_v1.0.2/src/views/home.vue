@@ -36,7 +36,7 @@
         			
         			<div style="padding: 16px;">
         				<p>需要使用高版本浏览器运行该系统。</p>
-        				<p>如：谷歌浏览器、火狐浏览器等。</p>
+        				<p>如：谷歌浏览器、火狐浏览器等...，高版本谷歌浏览器运行效果最佳</p>
         			</div>
         			
 				</Card>
@@ -52,7 +52,18 @@
         				<Timeline class="Timeline">
         					
 					        <TimelineItem>
-					            <Icon type="trophy" slot="dot"></Icon>
+					            <span class="title">v1.0.3</span>
+					            <p class="content">
+					            	<Icon type="ios-star-outline"></Icon>
+					            	升级了批量添加物品的表格，提高物品添加效率。
+					            </p>
+					            <p class="content">
+					            	<Icon type="ios-star-outline"></Icon>
+					            	可批量复制Excel表格的数据粘贴到线上表格中。
+					            </p>
+					        </TimelineItem>
+					        
+					        <TimelineItem>
 					            <span class="title">v1.0.2</span>
 					            <p class="content">
 					            	<Icon type="ios-star-outline"></Icon>
@@ -65,6 +76,15 @@
 					        	<p class="content">
 					        		<Icon type="ios-star-outline"></Icon>
 					        		优化UI，增加皮肤功能。
+					        	</p>
+					        </TimelineItem>
+					        
+					        <TimelineItem>
+					        	<Icon type="trophy" slot="dot"></Icon>
+					        	<span class="title">v1.0.0</span>
+					        	<p class="content">
+					        		<Icon type="ios-star-outline"></Icon>
+					        		ERP系统初步上线
 					        	</p>
 					        </TimelineItem>
 					        
