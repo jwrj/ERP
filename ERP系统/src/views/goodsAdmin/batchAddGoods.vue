@@ -13,7 +13,7 @@
 					<smartTable-newItem ref="smarInstance" :repeatData="repeatData"></smartTable-newItem>
 				</div>-->
 				
-				<div style="width: 100%;height: 800px;overflow: hidden;">
+				<div style="width: 100%;height: 600px;overflow: hidden;">
 					<hot-table ref="hotInstance" :root="root" :settings="hotsettings"></hot-table>
 				</div>
 				
@@ -64,7 +64,7 @@ export default {
 		        language: 'zh-CN',//语言设置
 		        contextMenu: false,//右键菜单功能
 		        mergeCells: false,//合并单元格功能
-		        minSpareRows:99,//最小多出空白的列数
+		        minSpareRows:25,//最小多出空白的列数
 		        minSpareCols:25,//最小多出空白的行数
 		       	manualColumnResize: true,//是否可调整列宽
 		       	manualRowResize: true,//是否可调整行高
