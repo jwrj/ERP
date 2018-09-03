@@ -107,7 +107,7 @@ export default {
         			fixed: 'left',
         			title: '总库存',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+						return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
         		},
         	],
@@ -128,7 +128,7 @@ export default {
         			width:120,
         			title: '库存数',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+						return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
         		},
         		{

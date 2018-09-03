@@ -13,12 +13,12 @@
 		        <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 			<!--客户下拉列表-->
-		    <Select v-if="clientSelect || ordClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" :placeholder="debtShow ? '查看客户欠款金额' : '查看客户库存'" style="width:200px;margin-right:10px;">
+		    <Select v-if="clientSelect || ordClientSelect || goodsClientSelect" filterable clearable :value="screenVal.client" @on-change="clientChange" :placeholder="selectClientText" style="width:200px;margin-right:10px;">
 		        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		    </Select>
 		    <!--搜索框-->
-			<Input class="seekBox" v-if="searchBox" @on-click="seekBut" @on-enter="seekBut" v-model="screenVal.seekTxtVal" placeholder="搜索名称" icon="ios-search" style="width:300px;margin-left:auto;"></Input>
-			<Button v-show="screenVal.seekTxtVal != ''" style="margin-left:2px;" type="ghost" @click="emptyBut" size="small" icon="close-round"></Button>
+	    	<Input class="seekBox" v-if="searchBox" @on-click="seekBut" @on-enter="seekBut" v-model="screenVal.seekTxtVal" :placeholder="seekType == 'name' ? '搜索名称' : '搜索批次'" icon="ios-search" style="width:300px;margin-left:auto;"></Input>
+	    	<Button v-show="screenVal.seekTxtVal != ''" style="margin-left:2px;" type="ghost" @click="emptyBut" size="small" icon="close-round"></Button>
 		</div>
 		
 		<!--表格-->
@@ -194,7 +194,7 @@ const editButton2 = (_this,h,params) => {//编辑按钮2(出现弹窗效果)
 			on:{
 				click: () => {
 					
-					console.log('点击了编辑按钮');
+					//console.log('点击了编辑按钮');
 					
 					_this.titleName = '编辑';//弹窗的标题名称
 					
@@ -242,7 +242,7 @@ const detailsButton = (_this,h,params) => {//详情按钮
 			on:{
 				click: () => {
 					
-					console.log('点击了详情按钮');
+					//console.log('点击了详情按钮');
 					
 					_this.titleName = '详情';//弹窗的标题名称
 					
@@ -286,7 +286,7 @@ const scheduleButton = (_this,h,params) => {//进度（点击会跳转路由的�
 			on:{
 				click: () => {
 					
-					console.log('点击了进度按钮');
+					//console.log('点击了进度按钮');
 					
 					//动态路由
 		    		_this.$router.push(
@@ -449,6 +449,11 @@ export default {
 	 		default: 'ordinaryDel',
 	 	},
 	 	
+	 	seekType: {//搜索类型
+	 		type: String,
+	 		default: 'name',
+	 	},
+	 	
 	 	//======================控件开关==================================
 	 	
 	 	screenTop:{//整个筛选栏
@@ -476,7 +481,7 @@ export default {
 	 		default: true,
 	 	},
 	 	
-	 	clientSelect:{//客户下拉列表
+	 	clientSelect:{//库存/出入库，客户下拉列表
 	 		type: Boolean,
 	 		default: false,
 	 	},
@@ -485,6 +490,12 @@ export default {
 	 		type: Boolean,
 	 		default: false,
 	 	},
+	 	
+	 	goodsClientSelect:{//物品客户下拉列表
+	 		type: Boolean,
+	 		default: false,
+	 	},
+	 	
 	 	debtShow:{//欠款总金额
 	 		type: Boolean,
 	 		default: false,
@@ -1079,7 +1090,7 @@ export default {
     		}
     		
     		if(query.date !== undefined){//日期
-    			console.log('日期');
+    			//console.log('日期');
     			
     			if(query.date[0] == '' || query.date[1] == ''){
     				
@@ -1099,7 +1110,7 @@ export default {
     		
     		if(query.orderStatus){//下拉
     			
-    			console.log('下拉');
+    			//console.log('下拉');
     			
 				this.screenVal.orderStatus = Number(query.orderStatus);
 
@@ -1109,7 +1120,7 @@ export default {
     		
     		if(query.client){//客户列表
     			
-    			console.log('客户列表');
+    			//console.log('客户列表');
     			
 				this.screenVal.client = Number(query.client);
 
@@ -1119,7 +1130,7 @@ export default {
     		
     		if(query.seek !== undefined){//搜索框
     			
-    			console.log('搜索框');
+    			//console.log('搜索框');
     			
     			this.stateInfo.seek = query.seek;
     			
@@ -1183,8 +1194,12 @@ export default {
     			where.pid_tree_title = ["=",this.pageId];
     		}
     		
-    		if(this.ordClientSelect && stateInfo.client){
+    		if(this.ordClientSelect && stateInfo.client){//订单下拉选择客户
     			where.for_user_id = ["=",stateInfo.client];
+    		}
+    		
+    		if(this.goodsClientSelect && stateInfo.client){//物品下拉选择客户
+    			where.for_kehu_id = ["=",stateInfo.client];
     		}
     		
     		if(this.whereId.length >= 2){
@@ -1203,7 +1218,11 @@ export default {
     		
     		if(stateInfo.seek){//搜索框
     			
-    			where.name = ["like","%"+stateInfo.seek+"%"];
+    			if(this.seekType == 'name'){
+    				where.name = ["like","%"+stateInfo.seek+"%"];
+    			}else if(this.seekType == 'batchOrder'){
+    				where.batchOrder = ["=",stateInfo.seek];
+    			}
     			
     		}
     		
@@ -1272,7 +1291,6 @@ export default {
 					let newData = this.formatData(response.data.dataList.data,this.columnsList);//重新组合表头数据
 					this.newColumnsList = newData.columns;
 					this.newTabelDataList = newData.data;
-					console.log(response.data.dataList.data);
 				}
 				
 				let arr = [{
@@ -1375,7 +1393,32 @@ export default {
         	
         	return io;
         	
-        }
+       	},
+       	selectClientText(){
+       		
+    		let text = '';
+    		
+    		if(this.debtShow){
+    			
+    			text = '查看客户欠款金额';
+    			
+    		}else if(this.ordClientSelect){
+    			
+    			text = '查看客户订单';
+    			
+    		}else if(this.goodsClientSelect){
+    			
+    			text = '查看客户物品';
+    			
+    		}else{
+    			
+    			text = '查看客户库存';
+    			
+    		}
+    		
+    		return text;
+    		
+       	},
     	
     },
    
@@ -1383,7 +1426,7 @@ export default {
     	
     	this.getDataList(this.stateInfo);//获取数据列表
     	
-    	if(this.clientSelect || this.ordClientSelect){
+    	if(this.clientSelect || this.ordClientSelect || this.goodsClientSelect){
     		this.getClient();//获取客户列表
     	}
     	
@@ -1403,7 +1446,7 @@ export default {
     	
     	'$route' (to, from) {// 对路由变化作出响应...
     		
-    		console.log('路由变化作出响应...');
+    		//console.log('路由变化作出响应...');
     		
     		this.holdState();//保持状态
     		
@@ -1413,7 +1456,7 @@ export default {
 	    
 	    'pageNumInfo'(newVal){//页码信息发生改变
 	    	
-	    	console.log('页码信息发生了变化');
+	    	//console.log('页码信息发生了变化');
 	    	
 	    	if(this.checkedData.length > 0){//选项状态
 	    		
@@ -1442,7 +1485,12 @@ export default {
     			this.setRoutePara(); //设置路由参数
 	    	}
 	    	
-	    }
+	    },
+	    goodsClientSelect(val){
+	    	if(val){
+    			this.getClient();//获取客户列表
+    		}
+	    },
     	
     }
 }

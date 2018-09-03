@@ -34,7 +34,7 @@ import axios from 'axios';
 			formData.append( v , _data[v]);
 			
 		}
-		console.log('-->发送了数据:',_data);
+//		console.log('-->发送了数据:',_data);
 		
 		// console.log('发送了数据:',formData);
 		
@@ -50,7 +50,7 @@ import axios from 'axios';
         let config = _config;
         //如果想每次请求的时候更改配置, 在这里增加config配置项
         
-		console.log('-->请求了URL('+_config.method+'):',_config.baseURL+_config.url);
+//		console.log('-->请求了URL('+_config.method+'):',_config.baseURL+_config.url);
 		
         return config;
         
@@ -63,7 +63,7 @@ import axios from 'axios';
 		
 		function(_res){//在这里对返回的数据进行处理
 			
-			console.log('<--返回了数据',_res.data);
+//			console.log('<--返回了数据',_res.data);
 			
 			if(_res.data.code == 1){//获取数据成功
 				
@@ -89,9 +89,9 @@ import axios from 'axios';
 			
 			vm.$Loading.error();
 			
-			console.log('>>>>>>发生了ajax错误' );
+//			console.log('>>>>>>发生了ajax错误' );
 			
-		    console.log('-------------------------------------------' );
+//		    console.log('-------------------------------------------' );
 	  
 			if(_err.response){//请求已经发出，但是服务器响应返回的状态码不在2xx的范围内		
 				
@@ -99,9 +99,9 @@ import axios from 'axios';
 			      
 			    vm.$Message.error('错误状态！'+_err.response.status);
 			    
-			    console.log('status:',_err.response.status);
+//			    console.log('status:',_err.response.status);
 			      
-			    console.log('statusText:',_err.response.statusText);
+//			    console.log('statusText:',_err.response.statusText);
 		      
 		    }else {//一些错误是在设置请求的时候触发		   
 		    	
@@ -118,15 +118,15 @@ import axios from 'axios';
 		    
 		    // console.log('_err.config',_err.config);
 		    
-		    console.log('url:' , _err.config.url );
+//		    console.log('url:' , _err.config.url );
 		    
-		    console.log('method:' , _err.config.method );
+//		    console.log('method:' , _err.config.method );
 		    
-		    console.log('data:' , _err.config.data );
+//		    console.log('data:' , _err.config.data );
 		    
-		    console.log('headers:' , _err.config.headers );
+//		    console.log('headers:' , _err.config.headers );
 		    
-		    console.log('-------------------------------------------' );	
+//		    console.log('-------------------------------------------' );	
 		    
 		  	// return Promise.reject(_err);
 		  	

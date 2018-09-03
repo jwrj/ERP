@@ -79,6 +79,8 @@
 					:pidTreeClassId="13"
 					stateListId="13"
 					:recombinationData="true"
+					:seekType="seekType"
+					:goodsClientSelect="goodsClientSelect"
 					
 					tableDataUrl="items/item_list"
 					seleSeekField="pid_tree_title"
@@ -133,7 +135,7 @@ export default {
         			fixed: 'left',
         			title: '总库存',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+                      	return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
         		},
         	],
@@ -154,7 +156,7 @@ export default {
         			width:80,
         			title: '库存数',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+						return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
         		},
         		{
@@ -244,6 +246,9 @@ export default {
                 
             },
             
+            seekType: 'name',
+            goodsClientSelect: false,
+            
             total: 0,
             pageSize:0,
             
@@ -298,6 +303,9 @@ export default {
     		}else{
     			
     			if(val == 19){
+    				
+    				this.goodsClientSelect = true;
+    				this.seekType = 'batchOrder';
     				
     				this.clientShow = true;
     				

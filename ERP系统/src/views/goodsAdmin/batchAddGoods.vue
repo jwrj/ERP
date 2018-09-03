@@ -13,6 +13,26 @@
 					<smartTable-newItem ref="smarInstance" :repeatData="repeatData"></smartTable-newItem>
 				</div>-->
 				
+				<Form ref="formItem" :model="formItem" :rules="ruleItem" :label-width="100" inline>
+					
+					<FormItem label="选择客户" prop="client">
+			            <Select v-model="formItem.client" filterable style="width:200px">
+					        <Option v-for="item in clientList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+					    </Select>
+			        </FormItem>
+					
+					<FormItem prop="classId" label="物品分类">
+						<Select style="width:200px" filterable v-model="formItem.classId" placeholder="无数据">
+					        <Option v-for="item in goodsClassList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+					    </Select>
+				    </FormItem>
+				    
+				    <FormItem label="批次">
+			            <Input v-model="formItem.batchOrder" placeholder="物品批次"></Input>
+			        </FormItem>
+			    
+			    </Form>
+				
 				<div style="width: 100%;height: 600px;overflow: hidden;">
 					<hot-table ref="hotInstance" :root="root" :settings="hotsettings"></hot-table>
 				</div>
@@ -95,7 +115,26 @@ export default {
 						//console.log(this.$refs.hotInstance.table.getSourceData());//获取整个表格的数据
 					}
 				}
-		    }
+		    },
+		    
+		    clientList: [],
+		    
+		    goodsClassList: [],//物品分类数据列表
+		    
+		    formItem: {//表单值
+        		classId: '',
+        		batchOrder: '',
+        		client:'',
+        	},
+        	
+        	ruleItem: {//表单验证
+				classId: [
+                    { type: 'number', required: true, message: '请选择物品分类', trigger: 'change' }
+                ],
+				client: [
+                    { type: 'number', required: true, message: '请选择客户', trigger: 'change' }
+                ],
+			},
         	
         }
     },
@@ -138,32 +177,47 @@ export default {
     		
       		//if(true)return false;
     		
-    		if(tables && tables.length > 0){
+    		this.$refs['formItem'].validate((valid) => {
     			
-    			this.$axios.post('items/item_batchAdd', {
-	    			itemTables: JSON.stringify(tables),
-	    			data: '{"pid_tree_title":24,"pid_tree_class":13}',
-				})
-				.then(response => {
-					
-					if(response.code == 1){
-						
-						this.renderTabelData(response.data);//渲染表格重复数据
-						
-						this.$Message.success('提交成功');
-						
-						this.$emit('submitSucceed');
-						
-					}
-					
-				})
-				.catch(function (error) {
-					console.log(error);
-				});
+    			if(valid){
+    				
+    				if(tables && tables.length > 0){
     			
-    		}else{
-    			this.$Message.info('还没有任何数据!');
-    		}
+		    			let data = {
+		    				pid_tree_title: this.formItem.classId,
+		    				pid_tree_class: 13,
+		    				for_kehu_id: this.formItem.client,
+		    				batchOrder: this.formItem.batchOrder,
+		    			}
+		    			
+		    			this.$axios.post('items/item_batchAdd', {
+			    			itemTables: JSON.stringify(tables),
+			    			data: JSON.stringify(data),
+						})
+						.then(response => {
+							
+							if(response.code == 1){
+								
+								this.renderTabelData(response.data);//渲染表格重复数据
+								
+								this.$Message.success('提交成功');
+								
+								this.$emit('submitSucceed');
+								
+							}
+							
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+		    			
+		    		}else{
+		    			this.$Message.info('还没有任何数据!');
+		    		}
+    				
+    			}
+    			
+    		})
     		
     	},
     	renderTabelData(repeat){//渲染表格重复数据
@@ -277,13 +331,74 @@ export default {
 		 	return itemTables;
 		 	
     	},
+    	articleClass(){//物品分类数据列表
+    		
+    		this.$axios.post('system/treeTitle_list', {
+    			
+				pid_tree_class: 13,
+				order: "id asc",
+        		
+			})
+			.then(response => {
+				
+				response.data.forEach(item => {
+					
+					this.goodsClassList.push({
+						label: item.name,
+						value: item.id,
+					});
+					
+				});
+				
+				if(response.data.length > 0){
+					this.formItem.classId = response.data[0].id;
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+				
+    	},
+    	getClientData(){//获取客户列表
+    		this.$axios.post('oa/customer_list', {
+				where: '{"pid_tree_title":["=","2"]}',
+    			order: '{"id":"desc"}',
+    			page: 1,
+    			pageSize: 99999,
+			})
+			.then(response => {
+				
+				let arr = [];
+				
+				response.data.dataList.data.forEach(item => {
+					
+					arr.push({
+						label: item.name,
+						value: item.id,
+					});
+					
+				})
+				
+				this.clientList = arr;
+				
+				if(this.clientList.length > 0){
+					this.formItem.client = this.clientList[0].value;
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+    	},
     	
     },
     computed:{//计算属性
     	
     },
     created(){//实例被创建完毕之后执行
-    	
+    	this.getClientData();//获取客户列表
+    	this.articleClass();//物品分类数据列表
 	},
     mounted(){//模板被渲染完毕之后执行
     	

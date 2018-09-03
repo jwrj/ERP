@@ -354,7 +354,9 @@
 	            	ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。
 	            	如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例：
             	*/
+            	
                 this.$refs.side1.toggleCollapse();
+                
             },
             changeMenu(menuName){//获取到点击当前的左侧菜单name值
             	
@@ -596,17 +598,29 @@
                 }
                 this.openNames = this.$store.state.mainFrame.openedSubmenuArr;
                 
-                this.$nextTick(() => {//解决页面刷新左菜单不默认展开问题
-	                this.$refs.sideMenu.updateOpened();//手动更新展开的子目录
-	                this.$refs.sideMenu.updateActiveName();//手动更新当前选择项
-		        });
+	            if(to.name == 'billEdit-1'){
+	            	
+	            	this.$refs.sideMenu.$children.forEach(item => {
+						if(item.opened){
+							item.opened = false;
+						}
+					})
+	            	
+	            }else{
+	            	
+	            	this.$nextTick(() => {//解决页面刷新左菜单不默认展开问题
+		                this.$refs.sideMenu.updateOpened();//手动更新展开的子目录
+		                this.$refs.sideMenu.updateActiveName();//手动更新当前选择项
+			        });
+	            	
+	            }
 		        
 		        //打开页的tag标签
 		        this.$store.commit('currentOpenPageList',this.$route);
             	this.tagArr = this.$store.state.mainFrame.pageOpenedList;
             	
 				this.tagSlide();//tag溢出滑动
-            	
+				
             }
         }
     }

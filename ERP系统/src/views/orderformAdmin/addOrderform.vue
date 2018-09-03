@@ -223,7 +223,7 @@ export default {
         			fixed: 'left',
         			title: '总库存',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+						return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
         		},
         		{
@@ -239,7 +239,7 @@ export default {
         					props: {
                                 type: 'success',
                                 size: 'small',
-                                disabled: params.row.extend_data[0].parts ? false : true,
+                                disabled: params.row.extend_data[0] ? params.row.extend_data[0].parts ? false : true : true,
                            },
                            style: {
                            		marginLeft: '4px',
@@ -253,7 +253,7 @@ export default {
                            			
                            		}
                            }
-        				},params.row.extend_data[0].parts ? '查看配件' : '无配件');
+        				},params.row.extend_data[0] ? params.row.extend_data[0].parts ? '查看配件' : '无配件' : '无配件');
                 		
                 	}
                 },
@@ -277,27 +277,8 @@ export default {
         			width:80,
         			title: '库存数',
                     render: (h, params) => {
-						return h('span',params.row.extend_data[0].number)
+						return h('span',params.row.extend_data[0] ? params.row.extend_data[0].number : 0)
                     }
-        		},
-        		{
-        			title: '其它信息',
-                    render: (h, params) => {
-							
-						let str = '';
-						
-						params.row.dataPage_show.formData.forEach(item => {
-							
-							item.formFields.forEach(item2 => {
-								
-								str += item2.label+'：'+item2.value+'，';
-								
-							});
-							
-						});
-						
-						return h('div',str)
-					},
         		},
         		{
         			width:160,
